@@ -15,7 +15,7 @@ public class EmailService
     private readonly string Email = "fitiarazafinjoelina10@gmail.com";
     private readonly string Password = "nyga twko oiko hags";
     
-    public async Task SendEmailOTPAsync(String from, String to,String otp)
+    public async Task SendEmailOtpAsync(String from, String to,String otp)
     {
         var email = new MimeMessage();
         email.From.Add(new MailboxAddress(from, Email));
