@@ -1,5 +1,8 @@
+
 using cloud.Database;
 using Microsoft.EntityFrameworkCore;
+using cloud.email;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddControllers(); 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -26,6 +31,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
+
+app.MapControllers();
 
 var summaries = new[]
 {
@@ -46,7 +53,6 @@ app.MapGet("/weatherforecast", () =>
     })
     .WithName("GetWeatherForecast")
     .WithOpenApi();
-
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
