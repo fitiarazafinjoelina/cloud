@@ -32,12 +32,10 @@ public class TokenController : ControllerBase
     [HttpPost("valid")]
     public async Task<bool> ValidateToken([FromHeader] string Authorization)
     {
-        if (string.IsNullOrEmpty(Authorization) || !Authorization.StartsWith("Bearer "))
+        if (string.IsNullOrEmpty(Authorization))
         {
-            return false; // Invalid or missing token
+            return false;
         }
-
-        // Extract token from the Authorization header
         var token = Authorization.Substring("Bearer ".Length).Trim();
 
         var isValid = await _tokenService.IsTokenValidAsync(token);
