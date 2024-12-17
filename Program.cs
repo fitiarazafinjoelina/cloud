@@ -3,6 +3,7 @@ using cloud.Database;
 using Microsoft.EntityFrameworkCore;
 using cloud.email;
 using cloud.pin;
+using cloud.lifeCycle;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddControllers(); 
 builder.Services.Configure<PinSettings>(builder.Configuration.GetSection("PinSettings"));
+
+builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))

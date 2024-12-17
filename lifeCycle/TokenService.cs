@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using cloud.Database;
+using cloud.Model;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace cloud.lifeCycle
@@ -17,9 +20,27 @@ namespace cloud.lifeCycle
             _context = context;
             _tokenSettings = tokenSettings.Value;
         }
-        public void createToken(string mail){
-           // int userId = 
-           // TokenHelper.GenerateToken(userId);
+        public string createToken(string email){
+            User user = _context.Users.FirstOrDefaultAsync(user => user.Email == email).Result;
+            int userId = user.IdUser;
+            return TokenHelper.GenerateToken(userId);
+        }
+
+        public User getUserByToken(string token)
+        {
+            Token tok = _context.Tokens.FirstOrDefaultAsync(tokenClass => tokenClass.Value == token).Result;
+            if (tok == null)
+            {
+                throw new Exception("Invalid token");
+            }
+            if (IsTokenValidAsync(tok.Value).Result)
+            {
+                return _context.Users.FirstOrDefaultAsync(userClass => userClass.IdUser == tok.UserId).Result;
+            }
+            else
+            {
+                throw new Exception("Invalid token");
+            }
         }
         public async Task<Token> CreateLoginTokenAsync(int userId)
         {
@@ -33,13 +54,27 @@ namespace cloud.lifeCycle
                 EndDate = DateTime.UtcNow.AddHours(_tokenSettings.TokenExpiryHours)
             };
 
-            // Save to database
             _context.Tokens.Add(token);
             await _context.SaveChangesAsync();
 
             return token;
         }
-        
+        public async Task<bool> IsTokenValidAsync(string token)
+        {
+            var tokena = await _context.Tokens
+                .Where(t => t.Value == token)
+                .OrderByDescending(t => t.StartDate)
+                .FirstOrDefaultAsync();
+            if (tokena == null)
+            {
+                return false;
+            }
+            if (tokena.EndDate < DateTime.UtcNow)
+            {
+                return false;
+            }
+            return true;
+        }
 
     }
 }

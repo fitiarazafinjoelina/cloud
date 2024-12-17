@@ -19,7 +19,7 @@ ALTER TABLE
 CREATE TABLE "pin"(
     "id_pin" SERIAL NOT NULL,
     "id_user" INTEGER NOT NULL,
-    "pin" INTEGER NOT NULL,
+    "pin_number" INTEGER NOT NULL,
     "date_debut" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
     "date_fin" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL
 );
