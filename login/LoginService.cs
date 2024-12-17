@@ -28,7 +28,8 @@ public class LoginService
             throw new Exception("Nb tentative max atteinte");
         }
         string hashedPassword = PasswordHelper.HashPassword(login.Password);
-        if (user.Password != hashedPassword)
+            
+        if (PasswordHelper.VerifyPassword(login.Password,user.Password))
         {
             user.NbTentative++;
             _context.SaveChanges();
