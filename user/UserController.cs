@@ -3,6 +3,7 @@ using cloud.email;
 using cloud.helper;
 using cloud.userValidation;
 using cloud.Utils;
+using cloud.lifeCycle;
 using Microsoft.AspNetCore.Mvc;
 
 namespace cloud.user;
@@ -13,11 +14,16 @@ namespace cloud.user;
 public class UserController: ControllerBase {
     private readonly AppDbContext _context;
     private readonly EmailService _emailService;
+    private readonly TokenService _tokenService;
 
-    public UserController(AppDbContext context, EmailService emailService) {
+
+    public UserController(AppDbContext context, EmailService emailService, TokenService tokenService) {
         _context = context;
         _emailService = emailService;
+        _tokenService = tokenService;
     }
+    
+    
 
     [HttpPost]
     public async Task<ResponseBody> Inscription(UserInscriptionDTO userInscriptionDto) {
@@ -43,6 +49,20 @@ public class UserController: ControllerBase {
         }
 
         return body;
+    }
+    
+    [HttpPost]
+    public IActionResult Modification([FromHeader] string Authorization ,UserInscriptionDTO userInscriptionDto) {
+        User user = _tokenService.getUserByToken(Authorization);
+        
+        user.Username = userInscriptionDto.Username;
+        user.Email = userInscriptionDto.Email;
+        user.Password = userInscriptionDto.Password;
+            
+        _context.Users.Update(user);
+        _context.SaveChanges();
+
+        return Ok();
     }
 
     
