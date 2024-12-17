@@ -16,33 +16,45 @@ public class LoginService
     private readonly TokenService _tokenService;
     private readonly PinService _pinService;
     private readonly EmailService _emailService;
-    public async Task<string> login(LoginDTO login)
+
+    public LoginService(AppDbContext context, TokenService tokenService, PinService pinService, EmailService emailService)
+    {
+        _context = context;
+        _tokenService = tokenService;
+        _pinService = pinService;
+        _emailService = emailService;
+    }
+
+
+    public string login(LoginDTO login)
     {
         User user = _context.Users.FirstOrDefault(u => u.Email == login.Email);
         if (user == null)
         {
+            Console.WriteLine("Helloooo");
             throw new KeyNotFoundException("This email address is not found");
         }
         if (user.NbTentative > 3)
         {
             throw new Exception("Nb tentative max atteinte");
         }
-        string hashedPassword = PasswordHelper.HashPassword(login.Password);
-            
-        if (PasswordHelper.VerifyPassword(login.Password,user.Password))
+        Console.WriteLine(user);
+        // Console.WriteLine(PasswordHelper.HashPassword(login.Password));
+        // Console.WriteLine(PasswordHelper.VerifyPassword(login.Password,user.Password));
+        if (!PasswordHelper.VerifyPassword(login.Password,user.Password))
         {
             user.NbTentative++;
             _context.SaveChanges();
             throw new Exception("Wrong password");
         }
 
-        TemporaryToken token = _tokenService.CreateLoginTemporaryTokenAsync(user.IdUser).Result;
+
+        TemporaryToken token = _tokenService.CreateLoginTemporaryTokenAsync(user.IdUser);
         UserToken userToken = new UserToken();
         userToken.token = token.Value;
         userToken.user = user;
-        user.Password = "";
         Pin pin = _pinService.CreatePin(userToken.user.IdUser).Result;
-        await _emailService.SendEmailOtpAsync("Nigga",user.Email,pin.PinNumber.ToString());
+        _emailService.SendEmailOtpAsync("Nigga",user.Email,pin.PinNumber.ToString());
         return userToken.token;
     }
 
@@ -50,23 +62,31 @@ public class LoginService
     {
         User user = _tokenService.getUserByTemporaryToken(token);
         bool isValid = _pinService.VerifyPin(user.IdUser, pin);
+        if (user.NbTentative > 3)
+        {
+            throw new Exception("Nb tentative max atteinte");
+        }
         if (!isValid)
         {
             user.NbTentative++;
+            _context.SaveChanges();
+            throw new Exception("Invalid pin");
         }
         else
         {
             user.NbTentative = 0;
-            return _tokenService.CreateLoginTokenAsync(user.IdUser).Result.Value;
+            _context.SaveChanges();
+            string tokene = _tokenService.CreateLoginTokenAsync(user.IdUser).Result.Value;
+            return tokene;
         }
-        _context.SaveChanges();
-        return "";
     }
 
-    public async void SendInitEmail(string token)
+    public async void SendInitEmail(string email)
     {
-        User user = _tokenService.getUserByTemporaryToken(token);
-        await _emailService.SendEmailAsync("Fits",user.Email,"Reinitialisation of nb de tentative","get Login/init-nb-tentative");
+        User user = _context.Users.FirstOrDefault(u => u.Email == email);
+        string token = _tokenService.CreateLoginTemporaryTokenAsync(user.IdUser).Value;
+        // User user = _tokenService.getUserByTemporaryToken(token);
+        await _emailService.SendEmailAsync("Fits",user.Email,"Reinitialisation of nb de tentative","get Login/init-nb-tentative/"+token);
     }
     public void InitNbTentative(string token)
     {

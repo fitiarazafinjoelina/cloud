@@ -4,22 +4,29 @@ using Microsoft.EntityFrameworkCore;
 using cloud.email;
 
 using cloud.lifeCycle;
-
+using cloud.login;
 using Microsoft.EntityFrameworkCore;
 using cloud.pin;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<PinService>();
+builder.Services.AddScoped<LoginService>();
 
 builder.Services.AddControllers(); 
 builder.Services.Configure<PinSettings>(builder.Configuration.GetSection("PinSettings"));
+
+builder.Services.AddSingleton<PinSettings>(sp =>
+    sp.GetRequiredService<IOptions<PinSettings>>().Value);
 
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
 
