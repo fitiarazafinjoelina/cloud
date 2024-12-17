@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using cloud.Database;
 using cloud.Model;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace cloud.lifeCycle
@@ -23,6 +24,23 @@ namespace cloud.lifeCycle
             User user = _context.Users.FirstOrDefaultAsync(user => user.Email == email).Result;
             int userId = user.IdUser;
             return TokenHelper.GenerateToken(userId);
+        }
+
+        public User getUserByToken(string token)
+        {
+            Token tok = _context.Tokens.FirstOrDefaultAsync(tokenClass => tokenClass.Value == token).Result;
+            if (tok == null)
+            {
+                throw new Exception("Invalid token");
+            }
+            if (IsTokenValidAsync(tok.Value).Result)
+            {
+                return _context.Users.FirstOrDefaultAsync(userClass => userClass.IdUser == tok.UserId).Result;
+            }
+            else
+            {
+                throw new Exception("Invalid token");
+            }
         }
         public async Task<Token> CreateLoginTokenAsync(int userId)
         {
