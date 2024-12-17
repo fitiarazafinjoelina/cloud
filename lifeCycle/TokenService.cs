@@ -95,12 +95,14 @@ namespace cloud.lifeCycle
         }
         public bool IsTokenValidAsync(string token)
         {
+            Console.WriteLine("D'accord");
             Token tokena =  _context.Tokens
                 .Where(t => t.Value == token)
                 .OrderByDescending(t => t.StartDate)
                 .FirstOrDefault();
             if (tokena == null)
             {
+                Console.WriteLine("Echo");
                 return false;
             }
             if (tokena.EndDate < DateTime.UtcNow)

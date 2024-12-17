@@ -38,7 +38,7 @@ public class LoginController:ControllerBase
         ResponseBody response = new ResponseBody();
         try
         {
-            string user = loginService.pin(Authorization,pin.pin).ToString();
+            string user = loginService.pin(Authorization,pin.Pin).ToString();
             response.StatusCode = 200;
             response.Data = "Success";
             response.Message = "";
