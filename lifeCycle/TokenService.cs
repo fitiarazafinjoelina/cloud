@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using cloud.Database;
 using cloud.Model;
+using cloud.temporaryToken;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -21,21 +22,37 @@ namespace cloud.lifeCycle
             _tokenSettings = tokenSettings.Value;
         }
         public string createToken(string email){
-            User user = _context.Users.FirstOrDefaultAsync(user => user.Email == email).Result;
+            User user = _context.Users.FirstOrDefault(user => user.Email == email);
             int userId = user.IdUser;
             return TokenHelper.GenerateToken(userId);
         }
 
         public User getUserByToken(string token)
         {
-            Token tok = _context.Tokens.FirstOrDefaultAsync(tokenClass => tokenClass.Value == token).Result;
+            Token tok = _context.Tokens.FirstOrDefault(tokenClass => tokenClass.Value == token);
             if (tok == null)
             {
                 throw new Exception("Invalid token");
             }
-            if (IsTokenValidAsync(tok.Value).Result)
+            if (IsTokenValidAsync(tok.Value))
             {
-                return _context.Users.FirstOrDefaultAsync(userClass => userClass.IdUser == tok.UserId).Result;
+                return _context.Users.FirstOrDefault(userClass => userClass.IdUser == tok.UserId);
+            }
+            else
+            {
+                throw new Exception("Invalid token");
+            }
+        }
+        public User getUserByTemporaryToken(string token)
+        {
+            TemporaryToken tok = _context.TemporaryTokens.FirstOrDefault(tokenClass => tokenClass.Value == token);
+            if (tok == null)
+            {
+                throw new Exception("Invalid token");
+            }
+            if (IsTokenValidAsync(tok.Value))
+            {
+                return _context.Users.FirstOrDefault(userClass => userClass.IdUser == tok.UserId);
             }
             else
             {
@@ -56,15 +73,30 @@ namespace cloud.lifeCycle
 
             _context.Tokens.Add(token);
             await _context.SaveChangesAsync();
-
             return token;
         }
-        public async Task<bool> IsTokenValidAsync(string token)
+        public async Task<TemporaryToken> CreateLoginTemporaryTokenAsync(int userId)
         {
-            var tokena = await _context.Tokens
+            string generatedToken = TokenHelper.GenerateToken(userId);
+
+            TemporaryToken token = new TemporaryToken
+            {
+                UserId = userId,
+                Value = generatedToken,
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddHours(_tokenSettings.TokenExpiryHours)
+            };
+
+            _context.TemporaryTokens.Add(token);
+            await _context.SaveChangesAsync();
+            return token;
+        }
+        public bool IsTokenValidAsync(string token)
+        {
+            Token tokena =  _context.Tokens
                 .Where(t => t.Value == token)
                 .OrderByDescending(t => t.StartDate)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
             if (tokena == null)
             {
                 return false;
