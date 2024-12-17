@@ -28,11 +28,11 @@ namespace cloud.lifeCycle
 
         public User getUserByToken(string token)
         {
-            // Token tok = _context.Tokens.FirstOrDefault(tokenClass => tokenClass.Value == token);
-            // if (tok == null)
-            // {
-            //     throw new Exception("Invalid token");
-            // }
+            Token tok = _context.Tokens.FirstOrDefault(tokenClass => tokenClass.Value == token);
+            if (tok == null)
+            {
+                throw new Exception("Invalid token");
+            }
             // if (IsTokenValidAsync(tok.Value).Result)
             // {
             //     return _context.Users.FirstOrDefaultAsync(userClass => userClass.IdUser == tok.UserId).Result;
@@ -41,8 +41,10 @@ namespace cloud.lifeCycle
             // {
             //     throw new Exception("Invalid token");
             // }
+            
+            return _context.Users.FirstOrDefault(userClass => userClass.IdUser == tok.UserId);
 
-            return _context.Users.Find(1);
+            // return _context.Users.Find(1);
         }
         public async Task<Token> CreateLoginTokenAsync(int userId)
         {
