@@ -76,6 +76,5 @@ namespace cloud.lifeCycle
             return true;
         }
 
-
     }
 }

@@ -2,6 +2,7 @@
 using cloud.Database;
 using Microsoft.EntityFrameworkCore;
 using cloud.email;
+using cloud.pin;
 using cloud.lifeCycle;
 
 
@@ -14,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddControllers(); 
+builder.Services.Configure<PinSettings>(builder.Configuration.GetSection("PinSettings"));
 
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
 
