@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace cloud.Model;
+namespace cloud.user;
 
-[Table("user")]
+[Table("cloud_user")]
 public class User {
     [Key]
     [Column("id_user")]
