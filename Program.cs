@@ -7,6 +7,8 @@ using cloud.lifeCycle;
 
 using Microsoft.EntityFrameworkCore;
 using cloud.pin;
+using cloud.user;
+using cloud.userValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<UserValidationService>();
+
 
 builder.Services.AddControllers(); 
 builder.Services.Configure<PinSettings>(builder.Configuration.GetSection("PinSettings"));

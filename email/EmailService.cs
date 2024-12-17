@@ -118,4 +118,6 @@ public class EmailService
 
         Console.WriteLine("Email from template sent successfully!");
     }
+
+
 }

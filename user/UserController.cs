@@ -15,12 +15,14 @@ public class UserController: ControllerBase {
     private readonly AppDbContext _context;
     private readonly EmailService _emailService;
     private readonly TokenService _tokenService;
+    private readonly UserService _userService;
 
 
-    public UserController(AppDbContext context, EmailService emailService, TokenService tokenService) {
+    public UserController(AppDbContext context, EmailService emailService, TokenService tokenService, UserService userService) {
         _context = context;
         _emailService = emailService;
         _tokenService = tokenService;
+        _userService = userService;
     }
     
     
@@ -30,18 +32,10 @@ public class UserController: ControllerBase {
         ResponseBody body = new ResponseBody();
 
         try {
-            UserValidation userValidation = new UserValidation() {
-                Username = userInscriptionDto.Username,
-                Email = userInscriptionDto.Email,
-                Password = PasswordHelper.HashPassword(userInscriptionDto.Password),
-            };
-
-            _context.UserValidations.Add(userValidation);
-            _context.SaveChanges();
-
+            UserValidation userValidation = _userService.SignUpUser(userInscriptionDto);
             await _emailService.SendEmailAsync("Test Email", userInscriptionDto.Email, "PIN Confirmation", EmailHelper.GetValidationEmail(userValidation.Id));
             body.StatusCode = 200;
-            body.Message = "Un mail est envoye pour confirmer votre compte";
+            body.Message = "Un mail a ete envoye pour confirmer votre compte";
         }
         catch (Exception e) {
             body.StatusCode = 500;
