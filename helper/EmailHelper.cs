@@ -61,7 +61,7 @@ public class EmailHelper {
     <div class=""container"">
       <!-- En-tête -->
       <div class=""header"">
-        <img src=""https://via.placeholder.com/150"" alt=""Logo de l'entreprise"" />
+        <!-- <img src=""https://via.placeholder.com/150"" alt=""Logo de l'entreprise"" /> -->
       </div>
       <!-- Contenu principal -->
       <div class=""content"">
@@ -70,7 +70,7 @@ public class EmailHelper {
           Merci de vous être inscrit ! Veuillez confirmer votre adresse email
           en cliquant sur le bouton ci-dessous.
         </p>
-        <a href=""users/valider?id={idUser}"" class=""btn""
+        <a href=""http://localhost:5143/api/UserValidation/{idUser}"" class=""btn""
           >Confirmer mon email</a
         >
         <p>
@@ -82,8 +82,8 @@ public class EmailHelper {
       <div class=""footer"">
         <p>&copy; 2024 Nom de l'Entreprise. Tous droits réservés.</p>
         <p>
-          <a href=""https://example.com/conditions"">Conditions d'utilisation</a>
-          | <a href=""https://example.com/politique"">Politique de confidentialité</a>
+          <a>Conditions d'utilisation</a>
+          | <a>Politique de confidentialité</a>
         </p>
       </div>
     </div>

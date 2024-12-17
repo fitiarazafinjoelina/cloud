@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace cloud.userValidation;
 
-[Controller]
+[ApiController]
 [Route("/api/[controller]")]
 public class UserValidationController {
     private readonly AppDbContext _context;
@@ -15,11 +15,11 @@ public class UserValidationController {
     }
 
 
-    [HttpGet("/{id}")]
+    [HttpGet("{id}")]
     public async Task<ResponseBody> Validate(int id) {
         ResponseBody response = new ResponseBody();
         try {
-            UserValidation? userValidation = _context.UserValidations.FirstOrDefault(u => u.Id == id, null);
+            UserValidation? userValidation = _context.UserValidations.First(u => u.Id == id);
             if (userValidation == null) {
                 throw new Exception($"Aucun utilisateur en cours de validation trouvee pour id: {id}");
             }
@@ -32,6 +32,8 @@ public class UserValidationController {
             };
 
             _context.Users.Add(user);
+            // _context.Attach(userValidation);
+            _context.UserValidations.Remove(userValidation);
             _context.SaveChanges();
 
             response.StatusCode = 200;
