@@ -61,4 +61,16 @@ public class LoginService
         _context.SaveChanges();
         return "";
     }
+
+    public async void SendInitEmail(string token)
+    {
+        User user = _tokenService.getUserByTemporaryToken(token);
+        await _emailService.SendEmailAsync("Fits",user.Email,"Reinitialisation of nb de tentative","get Login/init-nb-tentative");
+    }
+    public void InitNbTentative(string token)
+    {
+        User user = _tokenService.getUserByTemporaryToken(token);
+        user.NbTentative = 0;
+        _context.SaveChanges();
+    }
 }
