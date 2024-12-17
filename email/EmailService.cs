@@ -1,6 +1,3 @@
-using System.Net;
-using System.Net.Mail;
-
 namespace cloud.email;
 using System;
 using System.IO;
@@ -10,10 +7,10 @@ using MailKit.Net.Smtp;
 
 public class EmailService
 {
-    private readonly string Host = "smtp.gmail.com";
-    private readonly int Port = 587;
-    private readonly string Email = "fitiarazafinjoelina10@gmail.com";
-    private readonly string Password = "nyga twko oiko hags";
+    private const string Host = "smtp.gmail.com";
+    private const int Port = 587;
+    private const string Email = "fitiarazafinjoelina10@gmail.com";
+    private const string Password = "nyga twko oiko hags";
     
     public async Task SendEmailOtpAsync(String from, String to,String otp)
     {

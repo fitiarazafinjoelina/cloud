@@ -51,4 +51,41 @@ public class LoginController:ControllerBase
         }
         return response;
     }
+
+    [HttpGet("init-email")]
+    public async Task<ResponseBody> InitEmail([FromHeader] string Authorization)
+    {
+        ResponseBody response = new ResponseBody();
+        try
+        {
+            loginService.SendInitEmail(Authorization);
+            response.StatusCode = 200;
+            response.Data = "Success";
+            response.Message = "";
+        }
+        catch (Exception e)
+        {
+            response.StatusCode = 500;
+            response.Message = e.Message;
+        }
+        return response;
+    }
+    [HttpGet("init-nb-tentative")]
+    public async Task<ResponseBody> InitNbTentative([FromHeader] string Authorization)
+    {
+        ResponseBody response = new ResponseBody();
+        try
+        {
+            loginService.InitNbTentative(Authorization);
+            response.StatusCode = 200;
+            response.Data = "Success";
+            response.Message = "";
+        }
+        catch (Exception e)
+        {
+            response.StatusCode = 500;
+            response.Message = e.Message;
+        }
+        return response;
+    }
 }
