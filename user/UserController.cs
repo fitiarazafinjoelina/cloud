@@ -26,6 +26,22 @@ public class UserController: ControllerBase {
 
         return Ok();
     }
+    
+    [HttpPost]
+    public IActionResult Modification([FromHeader] string Authorization ,UserInscriptionDTO userInscriptionDto) {
+        
+        
+        User user = new User() {
+            Username = userInscriptionDto.Username,
+            Email = userInscriptionDto.Email,
+            Password = userInscriptionDto.Password
+        };
+
+        _context.Users.Add(user);
+        _context.SaveChanges();
+
+        return Ok();
+    }
 
 
     [HttpGet]
