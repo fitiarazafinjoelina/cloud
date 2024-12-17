@@ -33,16 +33,14 @@ namespace cloud.lifeCycle
             {
                 throw new Exception("Invalid token");
             }
-            // if (IsTokenValidAsync(tok.Value).Result)
-            // {
-            //     return _context.Users.FirstOrDefaultAsync(userClass => userClass.IdUser == tok.UserId).Result;
-            // }
-            // else
-            // {
-            //     throw new Exception("Invalid token");
-            // }
-            
-            return _context.Users.FirstOrDefault(userClass => userClass.IdUser == tok.UserId);
+            if (IsTokenValidAsync(tok.Value))
+            {
+                return _context.Users.FirstOrDefault(userClass => userClass.IdUser == tok.UserId);
+            }
+            else
+            {
+                throw new Exception("Invalid token");
+            }
 
             // return _context.Users.Find(1);
         }
@@ -63,12 +61,12 @@ namespace cloud.lifeCycle
 
             return token;
         }
-        public async Task<bool> IsTokenValidAsync(string token)
+        public bool IsTokenValidAsync(string token)
         {
-            var tokena = await _context.Tokens
+            Token tokena = _context.Tokens
                 .Where(t => t.Value == token)
                 .OrderByDescending(t => t.StartDate)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
             if (tokena == null)
             {
                 return false;
