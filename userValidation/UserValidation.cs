@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace cloud.user;
+namespace cloud.userValidation;
 
-[Table("user_cloud")]
-public class User {
+[Table("user_validation")]
+public class UserValidation {
     [Key]
-    [Column("id_user_cloud")]
-    public int IdUser { get; set; }
+    [Column("id")]
+    public int Id { get; set; }
 
     [Column("email")]
     public string Email { get; set; }
@@ -17,8 +17,5 @@ public class User {
 
     [Column("password")]
     public string Password { get; set; }
-
-    [Column("nb_tentative")]
-    public int NbTentative { get; set; }
-
+    
 }

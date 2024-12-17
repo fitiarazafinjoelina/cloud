@@ -1,6 +1,8 @@
 ﻿using cloud.Database;
 using cloud.email;
 using cloud.helper;
+using cloud.userValidation;
+using cloud.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace cloud.user;
@@ -18,21 +20,32 @@ public class UserController: ControllerBase {
     }
 
     [HttpPost]
-    public IActionResult Inscription(UserInscriptionDTO userInscriptionDto) {
-        User user = new User() {
-            Username = userInscriptionDto.Username,
-            Email = userInscriptionDto.Email,
-            Password = PasswordHelper.HashPassword(userInscriptionDto.Password)
-        };
+    public async Task<ResponseBody> Inscription(UserInscriptionDTO userInscriptionDto) {
+        ResponseBody body = new ResponseBody();
 
-        _context.Users.Add(user);
-        _emailService.SendEmailAsync("Test Email", userInscriptionDto.Email, "PIN Confirmation", "0000");
+        try {
+            UserValidation userValidation = new UserValidation() {
+                Username = userInscriptionDto.Username,
+                Email = userInscriptionDto.Email,
+                Password = PasswordHelper.HashPassword(userInscriptionDto.Password),
+            };
 
+            _context.UserValidations.Add(userValidation);
+            _context.SaveChanges();
 
-        _context.SaveChanges();
+            await _emailService.SendEmailAsync("Test Email", userInscriptionDto.Email, "PIN Confirmation", EmailHelper.GetValidationEmail(userValidation.Id));
+            body.StatusCode = 200;
+            body.Message = "Un mail est envoye pour confirmer votre compte";
+        }
+        catch (Exception e) {
+            body.StatusCode = 500;
+            body.Message = e.Message;
+        }
 
-        return Ok();
+        return body;
     }
+
+    
 
 
     [HttpGet]
