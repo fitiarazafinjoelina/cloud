@@ -1,3 +1,5 @@
+using cloud.helper;
+
 namespace cloud.email;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -20,6 +22,20 @@ public class EmailController : ControllerBase
         {
             await _emailService.SendEmailAsync(emailDto.From,emailDto.To,emailDto.Subject,emailDto.Body);
             return Ok(new { message = "Email sent successfully!" });
+        }
+        catch (System.Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while sending the email.", error = ex.Message });
+        }
+    }
+    [HttpPost("sendOTP")]
+    public async Task<IActionResult> SendEmailOtp([FromBody] EmailDTO emailDto)
+    {
+        try
+        {
+            var otp = OTPHelper.GenerateOTP();
+            await _emailService.SendEmailOTPAsync(emailDto.From, emailDto.To, otp);
+            return Ok(new { message = "DTO email sent successfully!" });
         }
         catch (System.Exception ex)
         {

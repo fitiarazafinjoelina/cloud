@@ -1,3 +1,6 @@
+using System.Net;
+using System.Net.Mail;
+
 namespace cloud.email;
 using System;
 using System.IO;
@@ -9,13 +12,36 @@ public class EmailService
 {
     private readonly string Host = "smtp.gmail.com";
     private readonly int Port = 587;
-    private readonly string Username = "fitiarazafinjoelina10@gmail.com";
+    private readonly string Email = "fitiarazafinjoelina10@gmail.com";
     private readonly string Password = "nyga twko oiko hags";
+    
+    public async Task SendEmailOTPAsync(String from, String to,String otp)
+    {
+        var email = new MimeMessage();
+        email.From.Add(new MailboxAddress(from, Email));
+        email.To.Add(MailboxAddress.Parse(to));
+        email.Subject = "Your one time pin";
+
+        var bodyBuilder = new BodyBuilder
+        {
+            HtmlBody = $"<p>Your one time pin is {otp}</p>"
+        };
+
+        email.Body = bodyBuilder.ToMessageBody();
+
+        using var smtp = new SmtpClient();
+        await smtp.ConnectAsync(Host, Port, MailKit.Security.SecureSocketOptions.StartTls);
+        await smtp.AuthenticateAsync(Email, Password);
+        await smtp.SendAsync(email);
+        await smtp.DisconnectAsync(true);
+
+        Console.WriteLine("Email sent successfully!");
+    }
 
     public async Task SendEmailAsync(String from, String to, String subject, String body)
     {
         var email = new MimeMessage();
-        email.From.Add(new MailboxAddress(from, Username));
+        email.From.Add(new MailboxAddress(from, Email));
         email.To.Add(MailboxAddress.Parse(to));
         email.Subject = subject;
 
@@ -28,7 +54,7 @@ public class EmailService
 
         using var smtp = new SmtpClient();
         await smtp.ConnectAsync(Host, Port, MailKit.Security.SecureSocketOptions.StartTls);
-        await smtp.AuthenticateAsync(Username, Password);
+        await smtp.AuthenticateAsync(Email, Password);
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
 
@@ -38,7 +64,7 @@ public class EmailService
     public async Task SendEmailWithImageAsync(String from, String to, String subject, String body,String imagePath,String attachmentPath)
     {
         var email = new MimeMessage();
-        email.From.Add(new MailboxAddress(from, Username));
+        email.From.Add(new MailboxAddress(from, Email));
         email.To.Add(MailboxAddress.Parse(to));
         email.Subject = subject;
 
@@ -58,7 +84,7 @@ public class EmailService
 
         using var smtp = new SmtpClient();
         await smtp.ConnectAsync(Host, Port, MailKit.Security.SecureSocketOptions.StartTls);
-        await smtp.AuthenticateAsync(Username, Password);
+        await smtp.AuthenticateAsync(Email, Password);
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
 
@@ -68,7 +94,7 @@ public class EmailService
     public async Task SendEmailFromTemplateAsync(String from, String to, String subject,String templatePath,String name,String message,String imagePath)
     {
         var email = new MimeMessage();
-        email.From.Add(new MailboxAddress(from, Username));
+        email.From.Add(new MailboxAddress(from, Email));
         email.To.Add(MailboxAddress.Parse(to));
         email.Subject = subject;
 
@@ -89,7 +115,7 @@ public class EmailService
 
         using var smtp = new SmtpClient();
         await smtp.ConnectAsync(Host, Port, MailKit.Security.SecureSocketOptions.StartTls);
-        await smtp.AuthenticateAsync(Username, Password);
+        await smtp.AuthenticateAsync(Email, Password);
         await smtp.SendAsync(email);
         await smtp.DisconnectAsync(true);
 
