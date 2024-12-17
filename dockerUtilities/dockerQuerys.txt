@@ -11,5 +11,10 @@ docker run -p 8080:8080 cloud_v1
 docker exec -it postgres_db psql -U postgres -d cloud
 \l: database ; \dt: tables
 
+//Envoyer le dump vers docker
+docker cp ./dockerUtilities/import.sql postgres_db:/tmp/init.sql
+//Importer le dump
+docker exec -it postgres_db psql -U postgres -d cloud -f /tmp/init.sql
+
 // Dump de la base de donnee
 pg_dump -U postgres -d cloud -F p > C:\Users\nicol\Documents\0-ITU\S5\webAvancee\cloud_v1\cloud\dockerUtilities\import.sql
