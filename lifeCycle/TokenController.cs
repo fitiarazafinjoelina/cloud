@@ -30,10 +30,20 @@ public class TokenController : ControllerBase
     }*/
 
     [HttpPost("valid")]
-    public async Task<Boolean> ValidateToken([FromBody] string token)
-    {   
-        var isValid = _tokenService.IsTokenValidAsync(token).Result;
+    public async Task<bool> ValidateToken([FromHeader] string Authorization)
+    {
+        if (string.IsNullOrEmpty(Authorization) || !Authorization.StartsWith("Bearer "))
+        {
+            return false; // Invalid or missing token
+        }
+
+        // Extract token from the Authorization header
+        var token = Authorization.Substring("Bearer ".Length).Trim();
+
+        var isValid = await _tokenService.IsTokenValidAsync(token);
+
         return isValid;
     }
+
     
 }
