@@ -17,6 +17,7 @@ public class User {
 
     [Column("password")]
     public string Password { get; set; }
-
+    [Column("nb_tentative")]
+    public int NbTentative { get; set; }
 
 }
