@@ -40,12 +40,15 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+        c.RoutePrefix = string.Empty; // Set this to '/' if Swagger is the homepage
+    });
 }
 
 // app.UseHttpsRedirection();
 app.UseAuthorization();
-app.MapGet("/", () => "Bienvenue sur l'application ASP.NET Core en HTTP !");
 
 app.MapControllers();
 
