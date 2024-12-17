@@ -1,6 +1,6 @@
 ﻿using cloud.user;
 using cloud.lifeCycle;
-using cloud.Model;
+using cloud.user;
 using cloud.pin;
 using cloud.temporaryToken;
 using Microsoft.EntityFrameworkCore;
