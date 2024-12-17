@@ -3,7 +3,7 @@ using cloud.email;
 using cloud.helper;
 using cloud.user;
 using cloud.lifeCycle;
-using cloud.Model;
+using cloud.user;
 using cloud.pin;
 using cloud.temporaryToken;
 using Org.BouncyCastle.Asn1.Cms;
