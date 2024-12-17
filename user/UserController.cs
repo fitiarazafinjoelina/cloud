@@ -1,4 +1,5 @@
 ﻿using cloud.Database;
+using cloud.lifeCycle;
 using Microsoft.AspNetCore.Mvc;
 
 namespace cloud.user;
@@ -8,9 +9,11 @@ namespace cloud.user;
 
 public class UserController: ControllerBase {
     private readonly AppDbContext _context;
-
-    public UserController(AppDbContext context) {
+    private readonly TokenService _tokenService;
+    
+    public UserController(AppDbContext context, TokenService tokenService) {
         _context = context;
+        _tokenService = tokenService;
     }
 
     [HttpPost]
@@ -29,15 +32,13 @@ public class UserController: ControllerBase {
     
     [HttpPost]
     public IActionResult Modification([FromHeader] string Authorization ,UserInscriptionDTO userInscriptionDto) {
+        User user = _tokenService.getUserByToken(Authorization);
         
-        
-        User user = new User() {
-            Username = userInscriptionDto.Username,
-            Email = userInscriptionDto.Email,
-            Password = userInscriptionDto.Password
-        };
-
-        _context.Users.Add(user);
+        user.Username = userInscriptionDto.Username;
+        user.Email = userInscriptionDto.Email;
+        user.Password = userInscriptionDto.Password;
+            
+        _context.Users.Update(user);
         _context.SaveChanges();
 
         return Ok();

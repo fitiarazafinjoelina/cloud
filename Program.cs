@@ -2,6 +2,7 @@
 using cloud.Database;
 using Microsoft.EntityFrameworkCore;
 using cloud.email;
+using cloud.lifeCycle;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -13,6 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<TokenService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
