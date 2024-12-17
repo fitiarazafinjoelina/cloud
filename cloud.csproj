@@ -24,7 +24,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Api\" />
+      <Folder Include="DTO\" />
       <Folder Include="Data\" />
+      <Folder Include="Model\" />
     </ItemGroup>
 
 </Project>
