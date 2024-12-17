@@ -1,4 +1,8 @@
 ﻿using cloud.Database;
+using cloud.email;
+using cloud.helper;
+using cloud.userValidation;
+using cloud.Utils;
 using cloud.lifeCycle;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,25 +12,42 @@ namespace cloud.user;
 [Route("/api/[controller]/[action]")]
 public class UserController: ControllerBase {
     private readonly AppDbContext _context;
+    private readonly EmailService _emailService;
     private readonly TokenService _tokenService;
-    
-    public UserController(AppDbContext context, TokenService tokenService) {
+
+
+    public UserController(AppDbContext context, EmailService emailService, TokenService tokenService) {
         _context = context;
+        _emailService = emailService;
         _tokenService = tokenService;
     }
+    
+    
 
     [HttpPost]
-    public IActionResult Inscription(UserInscriptionDTO userInscriptionDto) {
-        User user = new User() {
-            Username = userInscriptionDto.Username,
-            Email = userInscriptionDto.Email,
-            Password = userInscriptionDto.Password
-        };
+    public async Task<ResponseBody> Inscription(UserInscriptionDTO userInscriptionDto) {
+        ResponseBody body = new ResponseBody();
 
-        _context.Users.Add(user);
-        _context.SaveChanges();
+        try {
+            UserValidation userValidation = new UserValidation() {
+                Username = userInscriptionDto.Username,
+                Email = userInscriptionDto.Email,
+                Password = PasswordHelper.HashPassword(userInscriptionDto.Password),
+            };
 
-        return Ok();
+            _context.UserValidations.Add(userValidation);
+            _context.SaveChanges();
+
+            await _emailService.SendEmailAsync("Test Email", userInscriptionDto.Email, "PIN Confirmation", EmailHelper.GetValidationEmail(userValidation.Id));
+            body.StatusCode = 200;
+            body.Message = "Un mail est envoye pour confirmer votre compte";
+        }
+        catch (Exception e) {
+            body.StatusCode = 500;
+            body.Message = e.Message;
+        }
+
+        return body;
     }
     
     [HttpPost]
@@ -42,6 +63,8 @@ public class UserController: ControllerBase {
 
         return Ok();
     }
+
+    
 
 
     [HttpGet]
