@@ -14,11 +14,11 @@ public class EmailController : ControllerBase
     }
 
     [HttpPost("send")]
-    public async Task<IActionResult> SendEmail(String from, String to, String subject, String body)
+    public async Task<IActionResult> SendEmail([FromBody] EmailDTO emailDto)
     {
         try
         {
-            await _emailService.SendEmailAsync(from,to,subject,body);
+            await _emailService.SendEmailAsync(emailDto.From,emailDto.To,emailDto.Subject,emailDto.Body);
             return Ok(new { message = "Email sent successfully!" });
         }
         catch (System.Exception ex)
@@ -28,11 +28,11 @@ public class EmailController : ControllerBase
     }
 
     [HttpPost("send-with-image")]
-    public async Task<IActionResult> SendEmailWithImage(String from, String to, String subject, String body,String imagePath,String attachmentPath)
+    public async Task<IActionResult> SendEmailWithImage([FromBody] EmailDTO emailDto)
     {
         try
         {
-            await _emailService.SendEmailWithImageAsync(from, to, subject, body, imagePath, attachmentPath);
+            await _emailService.SendEmailWithImageAsync(emailDto.From,emailDto.To,emailDto.Subject,emailDto.Body,emailDto.ImagePath,emailDto.AttachmentPath);
             return Ok(new { message = "Email with image sent successfully!" });
         }
         catch (System.Exception ex)
@@ -42,11 +42,11 @@ public class EmailController : ControllerBase
     }
 
     [HttpPost("send-from-template")]
-    public async Task<IActionResult> SendEmailFromTemplate(String from, String to, String subject,String templatePath,String name,String message,String imagePath)
+    public async Task<IActionResult> SendEmailFromTemplate([FromBody] EmailDTO emailDto)
     {
         try
         {
-            await _emailService.SendEmailFromTemplateAsync(from, to, subject, templatePath, name, message, imagePath);
+            await _emailService.SendEmailFromTemplateAsync(emailDto.From,emailDto.To,emailDto.Subject,emailDto.TemplatePath,emailDto.Name,emailDto.Message,emailDto.ImagePath);
             return Ok(new { message = "Email sent from template successfully!" });
         }
         catch (System.Exception ex)
