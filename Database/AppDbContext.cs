@@ -1,7 +1,5 @@
-
-﻿using cloud.lifeCycle;
+using cloud.lifeCycle;
 using cloud.Model;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace cloud.Database;
