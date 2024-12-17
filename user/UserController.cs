@@ -6,7 +6,6 @@ namespace cloud.user;
 
 [ApiController]
 [Route("/api/[controller]/[action]")]
-
 public class UserController: ControllerBase {
     private readonly AppDbContext _context;
     private readonly TokenService _tokenService;
