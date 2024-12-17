@@ -1,9 +1,9 @@
 namespace cloud.helper;
 using System;
 
-public class OTPHelper
+public class PinHelper
 {
-    public static string GenerateOTP(int length = 6)
+    public static string GeneratePin(int length = 6)
     {
         var random = new Random();
         string otp = string.Empty;

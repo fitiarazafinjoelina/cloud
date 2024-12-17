@@ -28,20 +28,6 @@ public class EmailController : ControllerBase
             return StatusCode(500, new { message = "An error occurred while sending the email.", error = ex.Message });
         }
     }
-    [HttpPost("sendOTP")]
-    public async Task<IActionResult> SendEmailOtp([FromBody] EmailDTO emailDto)
-    {
-        try
-        {
-            var otp = OTPHelper.GenerateOTP();
-            await _emailService.SendEmailOTPAsync(emailDto.From, emailDto.To, otp);
-            return Ok(new { message = "DTO email sent successfully!" });
-        }
-        catch (System.Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred while sending the email.", error = ex.Message });
-        }
-    }
 
     [HttpPost("send-with-image")]
     public async Task<IActionResult> SendEmailWithImage([FromBody] EmailDTO emailDto)
