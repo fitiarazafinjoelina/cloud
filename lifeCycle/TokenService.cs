@@ -4,7 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using cloud.Database;
-using cloud.Model;
+using cloud.user;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -28,19 +28,21 @@ namespace cloud.lifeCycle
 
         public User getUserByToken(string token)
         {
-            Token tok = _context.Tokens.FirstOrDefaultAsync(tokenClass => tokenClass.Value == token).Result;
+            Token tok = _context.Tokens.FirstOrDefault(tokenClass => tokenClass.Value == token);
             if (tok == null)
             {
                 throw new Exception("Invalid token");
             }
-            if (IsTokenValidAsync(tok.Value).Result)
+            if (IsTokenValidAsync(tok.Value))
             {
-                return _context.Users.FirstOrDefaultAsync(userClass => userClass.IdUser == tok.UserId).Result;
+                return _context.Users.FirstOrDefault(userClass => userClass.IdUser == tok.UserId);
             }
             else
             {
                 throw new Exception("Invalid token");
             }
+
+            // return _context.Users.Find(1);
         }
         public async Task<Token> CreateLoginTokenAsync(int userId)
         {
@@ -59,12 +61,12 @@ namespace cloud.lifeCycle
 
             return token;
         }
-        public async Task<bool> IsTokenValidAsync(string token)
+        public bool IsTokenValidAsync(string token)
         {
-            var tokena = await _context.Tokens
+            Token tokena = _context.Tokens
                 .Where(t => t.Value == token)
                 .OrderByDescending(t => t.StartDate)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
             if (tokena == null)
             {
                 return false;

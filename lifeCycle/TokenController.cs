@@ -38,7 +38,7 @@ public class TokenController : ControllerBase
         }
         var token = Authorization.Substring("Bearer ".Length).Trim();
 
-        var isValid = await _tokenService.IsTokenValidAsync(token);
+        var isValid = _tokenService.IsTokenValidAsync(token);
 
         return isValid;
     }

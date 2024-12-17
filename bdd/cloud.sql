@@ -1,27 +1,27 @@
 CREATE TABLE "user_cloud"(
-    "id_user_cloud" SERIAL NOT NULL,
-    "email" VARCHAR(255) NOT NULL,
-    "username" VARCHAR(255) NOT NULL,
-    "password" VARCHAR(255) NOT NULL,
-    "nb_tentative" INTEGER NOT NULL
+                             "id_user_cloud" SERIAL NOT NULL,
+                             "email" VARCHAR(255) NOT NULL,
+                             "username" VARCHAR(255) NOT NULL,
+                             "password" VARCHAR(255) NOT NULL,
+                             "nb_tentative" INTEGER NOT NULL
 );
 ALTER TABLE
     "user_cloud" ADD PRIMARY KEY("id_user_cloud");
 CREATE TABLE "token"(
-    "id_token" SERIAL NOT NULL,
-    "token" VARCHAR(255) NOT NULL,
-    "date_debut" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
-    "date_fin" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
-    "id_user" INTEGER NOT NULL
+                        "id_token" SERIAL NOT NULL,
+                        "token" VARCHAR(255) NOT NULL,
+                        "date_debut" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
+                        "date_fin" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
+                        "id_user" INTEGER NOT NULL
 );
 ALTER TABLE
     "token" ADD PRIMARY KEY("id_token");
 CREATE TABLE "pin"(
-    "id_pin" SERIAL NOT NULL,
-    "id_user" INTEGER NOT NULL,
-    "pin_number" INTEGER NOT NULL,
-    "date_debut" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
-    "date_fin" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL
+                      "id_pin" SERIAL NOT NULL,
+                      "id_user" INTEGER NOT NULL,
+                      "pin_number" INTEGER NOT NULL,
+                      "date_debut" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
+                      "date_fin" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL
 );
 ALTER TABLE
     "pin" ADD PRIMARY KEY("id_pin");

@@ -1,7 +1,9 @@
+﻿using cloud.user;
 using cloud.lifeCycle;
 using cloud.Model;
 using cloud.pin;
 using Microsoft.EntityFrameworkCore;
+using Token = cloud.lifeCycle.Token;
 
 namespace cloud.Database;
 
