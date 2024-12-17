@@ -12,7 +12,7 @@ public class LoginController:ControllerBase
     private readonly LoginService loginService;
     private readonly HttpClient _client;
     private readonly TokenService tokenService;
-    [HttpPost("login")]
+    [HttpPost("")]
     public async Task<ResponseBody> Login([FromBody] LoginDTO login)
     {
         ResponseBody response = new ResponseBody();
