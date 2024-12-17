@@ -20,7 +20,7 @@
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: cloudv1
+      POSTGRES_DB: cloud
     volumes:
       - postgres_data:/var/lib/postgresql/data:rw
       - ./dockerUtilities/import.sql:/docker-entrypoint-initdb.d/import.sql
