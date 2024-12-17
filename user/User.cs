@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace cloud.user;
 
-[Table("cloud_user")]
+[Table("user_cloud")]
 public class User {
     [Key]
     [Column("id_user")]

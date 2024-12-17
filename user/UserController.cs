@@ -1,4 +1,6 @@
 ﻿using cloud.Database;
+using cloud.email;
+using cloud.helper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace cloud.user;
@@ -8,9 +10,11 @@ namespace cloud.user;
 
 public class UserController: ControllerBase {
     private readonly AppDbContext _context;
+    private readonly EmailService _emailService;
 
-    public UserController(AppDbContext context) {
+    public UserController(AppDbContext context, EmailService emailService) {
         _context = context;
+        _emailService = emailService;
     }
 
     [HttpPost]
@@ -18,10 +22,13 @@ public class UserController: ControllerBase {
         User user = new User() {
             Username = userInscriptionDto.Username,
             Email = userInscriptionDto.Email,
-            Password = userInscriptionDto.Password
+            Password = PasswordHelper.HashPassword(userInscriptionDto.Password)
         };
 
         _context.Users.Add(user);
+        _emailService.SendEmailAsync("Test Email", userInscriptionDto.Email, "PIN Confirmation", "0000");
+
+
         _context.SaveChanges();
 
         return Ok();
