@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace cloud.pin;
 
-[Table("Pin")]
+[Table("pin")]
 public class Pin
 {
     [Key]

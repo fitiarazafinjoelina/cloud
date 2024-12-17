@@ -11,8 +11,14 @@ namespace cloud.lifeCycle
             using (var hmac = new HMACSHA256())
             {
                 var key = Encoding.UTF8.GetBytes($"{userId}-{Guid.NewGuid()}-{DateTime.UtcNow}");
-                return Convert.ToBase64String(hmac.ComputeHash(key));
+                var hash = hmac.ComputeHash(key);
+                var base64Token = Convert.ToBase64String(hash);
+
+                var urlSafeToken = base64Token.Replace("+", "-").Replace("/", "_").TrimEnd('=');
+
+                return urlSafeToken;
             }
+
         }
     }
 }
