@@ -41,3 +41,16 @@ ALTER TABLE
     "temporary_token" ADD PRIMARY KEY("id_token");
 ALTER TABLE
     "temporary_token" ADD CONSTRAINT "temp_token_id_user_foreign" FOREIGN KEY("id_user") REFERENCES "user_cloud"("id_user_cloud");
+
+
+CREATE TABLE "temporary_uniqid"(
+                                  "id" SERIAL NOT NULL,
+                                  "uniqid" VARCHAR(255) NOT NULL,
+                                  "date_debut" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
+                                  "date_fin" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
+                                  "id_user" INTEGER NOT NULL
+);
+ALTER TABLE
+    "temporary_uniqid" ADD PRIMARY KEY("id");
+ALTER TABLE
+    "temporary_uniqid" ADD CONSTRAINT "temp_token_id_user_foreign" FOREIGN KEY("id_user") REFERENCES "user_cloud"("id_user_cloud");
