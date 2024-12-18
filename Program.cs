@@ -7,6 +7,7 @@ using cloud.lifeCycle;
 using cloud.login;
 using Microsoft.EntityFrameworkCore;
 using cloud.pin;
+using cloud.uniqIdentifier;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,7 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<PinService>();
 builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<UniqIndentifierService>();
 
 builder.Services.AddControllers(); 
 builder.Services.Configure<PinSettings>(builder.Configuration.GetSection("PinSettings"));
@@ -29,6 +31,10 @@ builder.Services.AddSingleton<PinSettings>(sp =>
     sp.GetRequiredService<IOptions<PinSettings>>().Value);
 
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
+
+builder.Services.AddSingleton<TokenSettings>(sp =>
+    sp.GetRequiredService<IOptions<TokenSettings>>().Value
+    );
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
