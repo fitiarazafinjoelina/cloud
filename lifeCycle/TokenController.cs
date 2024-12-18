@@ -7,6 +7,11 @@ namespace cloud.lifeCycle;
 public class TokenController : ControllerBase
 {
     public TokenService _tokenService;
+
+    public TokenController(TokenService tokenService)
+    {
+        _tokenService = tokenService;
+    }
     
     /*[HttpPost("login")]
     public async Task<IActionResult> CheckToken(string email)
@@ -36,9 +41,9 @@ public class TokenController : ControllerBase
         {
             return false;
         }
-        var token = Authorization.Substring("Bearer ".Length).Trim();
+        Console.WriteLine(Authorization);
 
-        var isValid = _tokenService.IsTokenValidAsync(token);
+        var isValid = _tokenService.IsTokenValidAsync(Authorization);
 
         return isValid;
     }

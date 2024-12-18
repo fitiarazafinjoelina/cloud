@@ -50,7 +50,7 @@ namespace cloud.lifeCycle
             {
                 throw new Exception("Invalid token");
             }
-            if (IsTokenValidAsync(tok.Value))
+            if (IsTemporaryTokenValidAsync(tok.Value))
             {
                 return _context.Users.FirstOrDefault(userClass => userClass.IdUser == tok.UserId);
             }
@@ -77,7 +77,7 @@ namespace cloud.lifeCycle
             await _context.SaveChangesAsync();
             return token;
         }
-        public async Task<TemporaryToken> CreateLoginTemporaryTokenAsync(int userId)
+        public TemporaryToken CreateLoginTemporaryTokenAsync(int userId)
         {
             string generatedToken = TokenHelper.GenerateToken(userId);
 
@@ -90,17 +90,37 @@ namespace cloud.lifeCycle
             };
 
             _context.TemporaryTokens.Add(token);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return token;
         }
         public bool IsTokenValidAsync(string token)
         {
+            Console.WriteLine("D'accord");
             Token tokena =  _context.Tokens
                 .Where(t => t.Value == token)
                 .OrderByDescending(t => t.StartDate)
                 .FirstOrDefault();
             if (tokena == null)
             {
+                Console.WriteLine("Echo");
+                return false;
+            }
+            if (tokena.EndDate < DateTime.UtcNow)
+            {
+                return false;
+            }
+            return true;
+        }
+        public bool IsTemporaryTokenValidAsync(string token)
+        {
+            Console.WriteLine("D'accord");
+            TemporaryToken tokena =  _context.TemporaryTokens
+                .Where(t => t.Value == token)
+                .OrderByDescending(t => t.StartDate)
+                .FirstOrDefault();
+            if (tokena == null)
+            {
+                Console.WriteLine("Echo");
                 return false;
             }
             if (tokena.EndDate < DateTime.UtcNow)

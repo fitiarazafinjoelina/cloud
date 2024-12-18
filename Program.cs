@@ -4,16 +4,19 @@ using Microsoft.EntityFrameworkCore;
 using cloud.email;
 
 using cloud.lifeCycle;
-
+using cloud.login;
 using Microsoft.EntityFrameworkCore;
 using cloud.pin;
 using cloud.user;
 using cloud.userValidation;
+using cloud.uniqIdentifier;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -21,12 +24,21 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<UserValidationService>();
-
+builder.Services.AddScoped<PinService>();
+builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<UniqIndentifierService>();
 
 builder.Services.AddControllers(); 
 builder.Services.Configure<PinSettings>(builder.Configuration.GetSection("PinSettings"));
 
+builder.Services.AddSingleton<PinSettings>(sp =>
+    sp.GetRequiredService<IOptions<PinSettings>>().Value);
+
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
+
+builder.Services.AddSingleton<TokenSettings>(sp =>
+    sp.GetRequiredService<IOptions<TokenSettings>>().Value
+    );
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -38,11 +50,16 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+        c.RoutePrefix = string.Empty; // Set this to '/' if Swagger is the homepage
+    });
 }
 
 // app.UseHttpsRedirection();
 app.UseAuthorization();
+
 app.MapControllers();
 
 var summaries = new[]

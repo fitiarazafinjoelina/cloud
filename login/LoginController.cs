@@ -13,6 +13,14 @@ public class LoginController:ControllerBase
     private readonly LoginService loginService;
     private readonly HttpClient _client;
     private readonly TokenService tokenService;
+
+    public LoginController(LoginService loginService, HttpClient client, TokenService tokenService)
+    {
+        this.loginService = loginService;
+        _client = client;
+        this.tokenService = tokenService;
+    }
+    
     [HttpPost("")]
     public async Task<ResponseBody> Login([FromBody] LoginDTO login)
     {
@@ -23,12 +31,18 @@ public class LoginController:ControllerBase
             response.StatusCode = 200;
             response.Data = "Success";
             response.Message = "";
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(user);
+            // Console.WriteLine(user);
+            // request.Headers.Add("Authorization", "YourCustomTokenHere");
+            Response.Headers.Authorization = user;
+            // _client.DefaultRequestHeaders.Add("Authorization",user);
         }
         catch (Exception e)
         {
             response.StatusCode = 500;
+            response.Data = null;
             response.Message = e.Message;
+            Console.WriteLine(e.StackTrace);
+            throw e;
         }
         return response;
     }
@@ -38,11 +52,11 @@ public class LoginController:ControllerBase
         ResponseBody response = new ResponseBody();
         try
         {
-            string user = loginService.pin(Authorization,pin.pin).ToString();
+            string user = loginService.pin(Authorization,pin.Pin).ToString();
             response.StatusCode = 200;
             response.Data = "Success";
             response.Message = "";
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(user);
+            Response.Headers.Authorization = user;
         }
         catch (Exception e)
         {
@@ -52,15 +66,15 @@ public class LoginController:ControllerBase
         return response;
     }
 
-    [HttpGet("init-email")]
-    public async Task<ResponseBody> InitEmail([FromHeader] string Authorization)
+    [HttpPost("init-email")]
+    public async Task<ResponseBody> InitEmail([FromBody] InitDTO initDto )
     {
         ResponseBody response = new ResponseBody();
         try
         {
-            loginService.SendInitEmail(Authorization);
+            loginService.SendInitEmail(initDto.Email);
             response.StatusCode = 200;
-            response.Data = "Success";
+            response.Data = "Mail successfully sent";
             response.Message = "";
         }
         catch (Exception e)
@@ -70,15 +84,15 @@ public class LoginController:ControllerBase
         }
         return response;
     }
-    [HttpGet("init-nb-tentative")]
-    public async Task<ResponseBody> InitNbTentative([FromHeader] string Authorization)
+    [HttpGet("init-nb-tentative/{uniqIdentifier}")]
+    public async Task<ResponseBody> InitNbTentative([FromRoute] string uniqIdentifier)
     {
         ResponseBody response = new ResponseBody();
         try
         {
-            loginService.InitNbTentative(Authorization);
+            loginService.InitNbTentative(uniqIdentifier);
             response.StatusCode = 200;
-            response.Data = "Success";
+            response.Data = "Success";  
             response.Message = "";
         }
         catch (Exception e)
