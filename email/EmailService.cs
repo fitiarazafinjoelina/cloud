@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace cloud.email;
 using System;
 using System.IO;
@@ -117,5 +119,11 @@ public class EmailService
         await smtp.DisconnectAsync(true);
 
         Console.WriteLine("Email from template sent successfully!");
+    }
+    
+    public bool CheckEmail(string email)
+    {
+        string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+        return Regex.IsMatch(email, emailPattern);
     }
 }

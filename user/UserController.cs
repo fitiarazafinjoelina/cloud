@@ -53,9 +53,24 @@ public class UserController: ControllerBase {
     [HttpPost]
     public IActionResult Modification([FromHeader] string Authorization ,UserInscriptionDTO userInscriptionDto) {
         User user = _tokenService.getUserByToken(Authorization);
-        
+
+        if (!_emailService.CheckEmail(userInscriptionDto.Email))
+        {
+            throw new Exception("Email invalide");
+        }
         user.Username = userInscriptionDto.Username;
         user.Email = userInscriptionDto.Email;
+            
+        _context.Users.Update(user);
+        _context.SaveChanges();
+
+        return Ok();
+    }
+    
+    [HttpPost]
+    public IActionResult ChangePassword([FromHeader] string Authorization ,UserInscriptionDTO userInscriptionDto) {
+        User user = _tokenService.getUserByToken(Authorization);
+        
         user.Password = userInscriptionDto.Password;
             
         _context.Users.Update(user);
@@ -64,7 +79,6 @@ public class UserController: ControllerBase {
         return Ok();
     }
 
-    
 
 
     [HttpGet]
