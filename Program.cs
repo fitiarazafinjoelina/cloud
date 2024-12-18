@@ -7,6 +7,8 @@ using cloud.lifeCycle;
 using cloud.login;
 using Microsoft.EntityFrameworkCore;
 using cloud.pin;
+using cloud.user;
+using cloud.userValidation;
 using cloud.uniqIdentifier;
 using Microsoft.Extensions.Options;
 
@@ -20,6 +22,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<UserValidationService>();
 builder.Services.AddScoped<PinService>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<UniqIndentifierService>();
