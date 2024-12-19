@@ -11,6 +11,8 @@ docker run -p 8080:8080 cloud_v1
 docker exec -it postgres_db psql -U postgres -d cloud
 \l: database ; \dt: tables
 
+Get-Content .\dockerUtilities/import.sql | Set-Content -Encoding UTF8 .\import_utf8.sql
+
 //Envoyer le dump vers docker
 docker cp ./dockerUtilities/import.sql postgres_db:/tmp/init.sql
 //Importer le dump
