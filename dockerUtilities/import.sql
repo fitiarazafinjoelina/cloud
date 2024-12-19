@@ -206,6 +206,42 @@ ALTER SEQUENCE public.user_cloud_id_user_cloud_seq OWNED BY public.user_cloud.id
 
 
 --
+-- Name: user_validation; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.user_validation (
+    id integer NOT NULL,
+    username character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    password character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.user_validation OWNER TO postgres;
+
+--
+-- Name: user_validation_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.user_validation_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_validation_id_seq OWNER TO postgres;
+
+--
+-- Name: user_validation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.user_validation_id_seq OWNED BY public.user_validation.id;
+
+
+--
 -- Name: pin id_pin; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -238,6 +274,13 @@ ALTER TABLE ONLY public.token ALTER COLUMN id_token SET DEFAULT nextval('public.
 --
 
 ALTER TABLE ONLY public.user_cloud ALTER COLUMN id_user_cloud SET DEFAULT nextval('public.user_cloud_id_user_cloud_seq'::regclass);
+
+
+--
+-- Name: user_validation id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_validation ALTER COLUMN id SET DEFAULT nextval('public.user_validation_id_seq'::regclass);
 
 
 --
@@ -281,6 +324,14 @@ COPY public.user_cloud (id_user_cloud, email, username, password, nb_tentative) 
 
 
 --
+-- Data for Name: user_validation; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.user_validation (id, username, email, password) FROM stdin;
+\.
+
+
+--
 -- Name: pin_id_pin_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -313,6 +364,13 @@ SELECT pg_catalog.setval('public.token_id_token_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.user_cloud_id_user_cloud_seq', 1, false);
+
+
+--
+-- Name: user_validation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.user_validation_id_seq', 1, false);
 
 
 --
@@ -353,6 +411,14 @@ ALTER TABLE ONLY public.token
 
 ALTER TABLE ONLY public.user_cloud
     ADD CONSTRAINT user_cloud_pkey PRIMARY KEY (id_user_cloud);
+
+
+--
+-- Name: user_validation user_validation_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_validation
+    ADD CONSTRAINT user_validation_pkey PRIMARY KEY (id);
 
 
 --
