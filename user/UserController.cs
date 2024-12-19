@@ -45,15 +45,10 @@ public class UserController: ControllerBase {
     }
     
     [HttpPost]
-    public IActionResult Modification([FromHeader] string Authorization ,UserInscriptionDTO userInscriptionDto) {
+    public IActionResult Modification([FromHeader] string Authorization , UserModifDTO userModifDto) {
         User user = _tokenService.getUserByToken(Authorization);
-
-        if (!_emailService.CheckEmail(userInscriptionDto.Email))
-        {
-            throw new Exception("Email invalide");
-        }
-        user.Username = userInscriptionDto.Username;
-        user.Email = userInscriptionDto.Email;
+        
+        user.Username = userModifDto.Username;
             
         _context.Users.Update(user);
         _context.SaveChanges();
@@ -62,10 +57,10 @@ public class UserController: ControllerBase {
     }
     
     [HttpPost]
-    public IActionResult ChangePassword([FromHeader] string Authorization ,UserInscriptionDTO userInscriptionDto) {
+    public IActionResult ChangePassword([FromHeader] string Authorization , UserPasswordDTO userPasswordDto) {
         User user = _tokenService.getUserByToken(Authorization);
         
-        user.Password = userInscriptionDto.Password;
+        user.Password = userPasswordDto.Password;
             
         _context.Users.Update(user);
         _context.SaveChanges();
