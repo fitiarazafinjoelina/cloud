@@ -70,9 +70,10 @@ public class EmailHelper {
           Merci de vous être inscrit ! Veuillez confirmer votre adresse email
           en cliquant sur le bouton ci-dessous.
         </p>
-        <a href=""http://localhost:5143/api/UserValidation/{idUser}"" class=""btn""
+        <a href=""http://localhost:8081/api/UserValidation/{idUser}"" class=""btn""
           >Confirmer mon email</a
         >
+        <p>Postman endpoint: http://localhost:8081/api/UserValidation/{idUser}</p>
         <p>
           Si vous n'avez pas demandé cette vérification, ignorez simplement ce
           message.
