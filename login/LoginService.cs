@@ -56,7 +56,7 @@ public class LoginService
         userToken.token = token.Value;
         userToken.user = user;
         Pin pin = _pinService.CreatePin(userToken.user.IdUser).Result;
-        _emailService.SendEmailOtpAsync("Nigga",user.Email,pin.PinNumber.ToString());
+        _emailService.SendEmailOtpAsync("Admin",user.Email,pin.PinNumber.ToString());
         return userToken.token;
     }
 
@@ -88,7 +88,7 @@ public class LoginService
         User user = _context.Users.FirstOrDefault(u => u.Email == email);
         string token = _uniqIndentifierService.CreateUniqIdentifier(user.IdUser).Uniqid;
         // User user = _tokenService.getUserByTemporaryToken(token);
-        await _emailService.SendEmailAsync("Fits",user.Email,"Reinitialisation of nb de tentative","get Login/init-nb-tentative/"+token);
+        await _emailService.SendEmailAsync("Admin",user.Email,"Reinitialisation of nb de tentative","get Login/init-nb-tentative/"+token);
     }
     public void InitNbTentative(string token)
     {
