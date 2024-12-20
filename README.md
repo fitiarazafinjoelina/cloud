@@ -15,3 +15,7 @@
     -Une fois fait , aller dans le lien unique fourni par la réinitialisation de l'email
     -Modification de nom d'utilisateur nécessite le token actuel (provenance validation pin)
     -Modification de mot de passe nécessite le token actuel (provenance validation pin) 
+## Collection postman
+    - collection.json
+## MPD
+    -MPD.png
