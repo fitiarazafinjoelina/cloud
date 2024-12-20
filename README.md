@@ -1,6 +1,6 @@
 # Cloud
 
-## Demarer l'environnement et application ASP.NET
+## Demarrer l'environnement et application ASP.NET
 ```docker compose up --build```
 
 ## Pour eteindre l'application
