@@ -184,43 +184,6 @@ CREATE TABLE public."user" (
 ALTER TABLE public."user" OWNER TO postgres;
 
 --
--- Name: userCloud; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public."userCloud" (
-    id_user integer NOT NULL,
-    email character varying(255) NOT NULL,
-    username character varying(255) NOT NULL,
-    password character varying(255) NOT NULL,
-    id_role integer NOT NULL
-);
-
-
-ALTER TABLE public."userCloud" OWNER TO postgres;
-
---
--- Name: userCloud_id_user_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public."userCloud_id_user_seq"
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public."userCloud_id_user_seq" OWNER TO postgres;
-
---
--- Name: userCloud_id_user_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public."userCloud_id_user_seq" OWNED BY public."userCloud".id_user;
-
-
---
 -- Name: user_cloud; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -351,13 +314,6 @@ ALTER TABLE ONLY public."user" ALTER COLUMN id_user SET DEFAULT nextval('public.
 
 
 --
--- Name: userCloud id_user; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public."userCloud" ALTER COLUMN id_user SET DEFAULT nextval('public."userCloud_id_user_seq"'::regclass);
-
-
---
 -- Name: user_cloud id_user_cloud; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -459,14 +415,6 @@ COPY public."user" (id_user, email, username, password, id_role) FROM stdin;
 
 
 --
--- Data for Name: userCloud; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public."userCloud" (id_user, email, username, password, id_role) FROM stdin;
-\.
-
-
---
 -- Data for Name: user_cloud; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -514,13 +462,6 @@ SELECT pg_catalog.setval('public.temporary_uniqid_id_seq', 1, true);
 --
 
 SELECT pg_catalog.setval('public.token_id_token_seq', 10, true);
-
-
---
--- Name: userCloud_id_user_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public."userCloud_id_user_seq"', 1, false);
 
 
 --
@@ -574,14 +515,6 @@ ALTER TABLE ONLY public.temporary_uniqid
 
 ALTER TABLE ONLY public.token
     ADD CONSTRAINT token_pkey PRIMARY KEY (id_token);
-
-
---
--- Name: userCloud userCloud_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public."userCloud"
-    ADD CONSTRAINT "userCloud_pkey" PRIMARY KEY (id_user);
 
 
 --

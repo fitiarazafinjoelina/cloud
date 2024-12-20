@@ -12,6 +12,6 @@
     -Validation pin renvoie le token que l'utilisateur doit utiliser
     -Réinitialisation d'email :
         .Doit envoyer une requête de réinitialisation par email
-    -Une fois fait aller dans le lien unique fourni par la réinitialisation de l'email
+    -Une fois fait , aller dans le lien unique fourni par la réinitialisation de l'email
     -Modification de nom d'utilisateur nécessite le token actuel (provenance validation pin)
     -Modification de mot de passe nécessite le token actuel (provenance validation pin) 
