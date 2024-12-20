@@ -60,8 +60,8 @@ public class UserController: ControllerBase {
     public IActionResult ChangePassword([FromHeader] string Authorization , UserPasswordDTO userPasswordDto) {
         User user = _tokenService.getUserByToken(Authorization);
         
-        user.Password = userPasswordDto.Password;
-            
+        user.Password = PasswordHelper.HashPassword(userPasswordDto.Password);
+        
         _context.Users.Update(user);
         _context.SaveChanges();
 
