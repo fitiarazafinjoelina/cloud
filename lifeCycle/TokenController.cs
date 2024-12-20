@@ -34,19 +34,5 @@ public class TokenController : ControllerBase
         return Unauthorized("Token is invalid or expired");
     }*/
 
-    [HttpPost("valid")]
-    public async Task<bool> ValidateToken([FromHeader] string Authorization)
-    {
-        if (string.IsNullOrEmpty(Authorization))
-        {
-            return false;
-        }
-        Console.WriteLine(Authorization);
-
-        var isValid = _tokenService.IsTokenValidAsync(Authorization);
-
-        return isValid;
-    }
-
     
 }
