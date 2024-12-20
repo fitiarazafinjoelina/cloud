@@ -32,7 +32,7 @@ public class UserController: ControllerBase {
 
         try {
             UserValidation userValidation = _userService.SignUpUser(userInscriptionDto);
-            await _emailService.SendEmailAsync("Test Email", userInscriptionDto.Email, "PIN Confirmation", EmailHelper.GetValidationEmail(userValidation.Id));
+            await _emailService.SendEmailAsync("Cloud", userInscriptionDto.Email, "Confirmation Compte", EmailHelper.GetValidationEmail(userValidation.Id));
             body.StatusCode = 200;
             body.Message = "Un mail a ete envoye pour confirmer votre compte";
         }
