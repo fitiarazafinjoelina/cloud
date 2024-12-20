@@ -41,8 +41,6 @@ public class LoginController:ControllerBase
             response.StatusCode = 500;
             response.Data = null;
             response.Message = e.Message;
-            Console.WriteLine(e.StackTrace);
-            throw e;
         }
         return response;
     }
