@@ -23,6 +23,27 @@ public class UserController: ControllerBase {
         _tokenService = tokenService;
         _userService = userService;
     }
+
+    [HttpGet]
+    public  ResponseBody GetUser([FromHeader] String Authorization) {
+        // if(Authorization == null)
+        ResponseBody responseBody = new ResponseBody();
+        try {
+            User user = _tokenService.getUserByToken(Authorization);
+            responseBody.StatusCode = 200;
+            responseBody.Data = new {
+                Email = user.Email,
+                Username = user.Username,
+                Password = user.Password
+            };
+        }
+        catch (Exception e) {
+            responseBody.StatusCode = 500;
+            responseBody.Data = e.Message;
+        }
+
+        return responseBody;
+    }
     
     
 
