@@ -42,7 +42,7 @@ public class LoginController:ControllerBase
             response.Data = null;
             response.Message = e.Message;
             Console.WriteLine(e.StackTrace);
-            throw e;
+            // throw e;
         }
         return response;
     }
