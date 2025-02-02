@@ -199,16 +199,15 @@ public class FirestoreUniversalListener
         var tableName = entityType.GetTableName();
         var idColumnName = entityType.FindPrimaryKey().Properties.First().GetColumnName();
         
-        Console.WriteLine($"Id: {id}");
-        
-        int rowCount = dbContext.Database.ExecuteSqlRaw(
-            $"SELECT COUNT(*) FROM {tableName} WHERE {idColumnName} = "+id, 
-            new NpgsqlParameter("p0", id));
-
-        Console.WriteLine($"The count is: {rowCount}");
-        var exists = rowCount > 0;
-        Console.WriteLine($"Existence: {exists}");
-        
+        bool exists;
+        using (var command = dbContext.Database.GetDbConnection().CreateCommand())
+        {
+            command.CommandText = $"SELECT COUNT(*) FROM {tableName} WHERE {idColumnName} = @p0";
+            command.Parameters.Add(new NpgsqlParameter("p0", NpgsqlDbType.Bigint) { Value = id });
+            
+            dbContext.Database.OpenConnection();
+            exists = Convert.ToInt32(command.ExecuteScalar()) > 0;
+        }
         var parameters = new List<NpgsqlParameter> { new NpgsqlParameter("p_id", NpgsqlDbType.Bigint) { Value = id } };
         var setClauses = new List<string>();
         var insertColumns = new List<string> { idColumnName };
@@ -237,13 +236,11 @@ public class FirestoreUniversalListener
 
         if (exists)
         {
-            // UPDATE
             var updateSql = $"UPDATE {tableName} SET {string.Join(", ", setClauses)} WHERE {idColumnName} = @p_id";
             dbContext.Database.ExecuteSqlRaw(updateSql, parameters.ToArray());
         }
         else
         {
-            // INSERT
             var insertSql = $"INSERT INTO {tableName} ({string.Join(", ", insertColumns)}) " +
                           $"VALUES ({string.Join(", ", insertValues)})";
             dbContext.Database.ExecuteSqlRaw(insertSql, parameters.ToArray());
