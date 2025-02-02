@@ -7,21 +7,26 @@ namespace cloud.user;
 
 public class UserService {
     private readonly AppDbContext _context;
+    private bool hash = true;
+
+    public bool Hash
+    {
+        get => hash;
+        set => hash = value;
+    }
 
     public UserService(AppDbContext context) {
         _context = context;
     }
-
+    
     public UserValidation SignUpUser(UserInscriptionDTO userInscriptionDto) {
         UserValidation userValidation = new UserValidation {
             Username = userInscriptionDto.Username,
             Email = userInscriptionDto.Email,
-            Password = PasswordHelper.HashPassword(userInscriptionDto.Password)
+            Password = Hash ? PasswordHelper.HashPassword(userInscriptionDto.Password) : userInscriptionDto.Password
         };
-
         _context.UserValidations.Add(userValidation);
         _context.SaveChanges();
-
         return userValidation;
     }
 }

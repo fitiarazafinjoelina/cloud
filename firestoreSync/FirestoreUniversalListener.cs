@@ -3,6 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.SqlClient;
 using System.Reflection;
 using cloud.Database;
+using cloud.email;
+using cloud.helper;
+using cloud.user;
+using cloud.userValidation;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -10,12 +14,22 @@ using Npgsql;
 using NpgsqlTypes;
 
 namespace cloud.firestoreSync;
-
+using AutoMapper;
 using FirebaseAdmin;
 using Google.Cloud.Firestore;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+public class SaveOrUpdateContext
+{
+    public Type EntityClass { get; set; }
+    public DocumentSnapshot Document { get; set; }
+    public AppDbContext DbContext { get; set; }
+    public string TableName { get; set; }
+    public string IdColumnName { get; set; }
+    public long Id { get; set; }
+    public Dictionary<string, object> Data { get; set; }
+}
 
 public class FirestoreUniversalListener
 {
@@ -24,7 +38,8 @@ public class FirestoreUniversalListener
     private readonly CancellationTokenSource _cts;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly List<string> _syncTables;
-
+    private EmailService _emailService;
+    private UserService _userService;
     public FirestoreUniversalListener(string projectId, string credentialsPath, IConfiguration configuration, IServiceScopeFactory serviceScopeFactory)
     {
         FirebaseApp.Create(new AppOptions
@@ -36,6 +51,9 @@ public class FirestoreUniversalListener
         _activeListeners = new ConcurrentDictionary<string, FirestoreChangeListener>();
         _cts = new CancellationTokenSource();
         _serviceScopeFactory = serviceScopeFactory;
+        _emailService = _serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<EmailService>();
+        _userService = _serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<UserService>();
+        _userService.Hash = false;
     }
 
     public async Task StartUniversalListeningAsync()
@@ -109,11 +127,21 @@ public class FirestoreUniversalListener
                 var entityClass = FindEntityClass(collectionId, _dbContext);
 
                 Console.WriteLine("Document Changes:"+change.ChangeType.ToString());
+                var context = new SaveOrUpdateContext
+                {
+                    Document = document,
+                    DbContext = _dbContext,
+                    TableName = null,
+                    IdColumnName = null,
+                    Data = document.ToDictionary(),
+                    EntityClass = FindEntityClass(collectionId, _dbContext)
+                };
+
                 switch (change.ChangeType)
                 {
                     case DocumentChange.Type.Added:
                     case DocumentChange.Type.Modified:
-                        SaveOrUpdateEntity(entityClass, document, _dbContext);
+                        SaveOrUpdateEntity(context);
                         break;
                     case DocumentChange.Type.Removed:
                         DeleteEntity(entityClass, document, _dbContext);
@@ -126,151 +154,127 @@ public class FirestoreUniversalListener
             }
         }
     }
-    // public void SaveOrUpdateEntity(Type entityClass, DocumentSnapshot document,AppDbContext dbContext)
-    // {
-    //     try
-    //     {
-    //         Console.WriteLine("FROM Firestore");
-    //         long id = long.Parse(document.Id);
-    //         var managedEntity = Activator.CreateInstance(entityClass);
-    //         var data = document.ToDictionary();
-    //
-    //         foreach (var property in entityClass.GetProperties())
-    //         {
-    //             if (data.ContainsKey(property.Name))
-    //             {
-    //                 var value = ConvertValue(property.PropertyType, data[property.Name]);
-    //                 property.SetValue(managedEntity, value);
-    //             }
-    //         }
-    //         
-    //         
-    //         
-    //         var setMethod = dbContext.GetType().GetMethod("Set");
-    //         Console.WriteLine($"{data.ToString()}");
-    //
-    //         if (setMethod != null)
-    //         {
-    //             var genericSetMethod = setMethod.MakeGenericMethod(entityClass);
-    //             var dbSet = genericSetMethod.Invoke(dbContext, null);  
-    //             var findMethod = dbSet.GetType().GetMethod("Find", new[] { typeof(long) });
-    //             var dbEntity = findMethod.Invoke(dbSet, new object[] { id });
-    //
-    //             if (dbEntity != null)
-    //             {
-    //                 Console.WriteLine($"{dbEntity.ToString()}");
-    //                 
-    //                 dbContext.Entry(dbEntity).CurrentValues.SetValues(managedEntity);
-    //             }
-    //             else
-    //             {
-    //                 dbSet.GetType().GetMethod("Add").Invoke(dbSet, new[] { managedEntity });
-    //             }
-    //
-    //             dbContext.SaveChanges();
-    //         }
-    //         else
-    //         {
-    //             Console.WriteLine("Error: Could not find the 'Set' method on the DbContext.");
-    //         }
-    //         
-    //         // var data2 = ConvertEntity(managedEntity);
-    //         // string sql = PrepareSql(entityClass, data2, id);
-    //         // var parameters = PrepareParams(data2, id);
-    //
-    //         // Assuming you have a method to execute raw SQL in your DbContext
-    //         // _dbContext.Database.ExecuteSqlRaw(sql, parameters);
-    //
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         Console.WriteLine(e.StackTrace);
-    //         Console.Error.WriteLine($"Error saving entity: {e.Message}");
-    //     }
-    // }
-   public void SaveOrUpdateEntity(Type entityClass, DocumentSnapshot document, AppDbContext dbContext)
-{
-    try
-    {
-        long id = long.Parse(document.Id);
-        var data = document.ToDictionary();
-
-        var entityType = dbContext.Model.FindEntityType(entityClass);
-        var tableName = entityType.GetTableName();
-        var idColumnName = entityType.FindPrimaryKey().Properties.First().GetColumnName();
-        
-        bool exists;
-        using (var command = dbContext.Database.GetDbConnection().CreateCommand())
-        {
-            command.CommandText = $"SELECT COUNT(*) FROM {tableName} WHERE {idColumnName} = @p0";
-            command.Parameters.Add(new NpgsqlParameter("p0", NpgsqlDbType.Bigint) { Value = id });
-            
-            dbContext.Database.OpenConnection();
-            exists = Convert.ToInt32(command.ExecuteScalar()) > 0;
-        }
-        var parameters = new List<NpgsqlParameter> { new NpgsqlParameter("p_id", NpgsqlDbType.Bigint) { Value = id } };
-        var setClauses = new List<string>();
-        var insertColumns = new List<string> { idColumnName };
-        var insertValues = new List<string> { "@p_id" };
-
-        foreach (var property in entityClass.GetProperties())
-        {
-            if (property.GetCustomAttribute<KeyAttribute>() != null) continue;
-
-            var columnAttr = property.GetCustomAttribute<ColumnAttribute>();
-            var columnName = columnAttr?.Name ?? property.Name;
-            
-            if (data.TryGetValue(property.Name, out object value))
-            {
-                var paramName = $"@p_{columnName}";
-                parameters.Add(new NpgsqlParameter(paramName, GetNpgsqlDbType(property.PropertyType))
-                {
-                    Value = ConvertValue(property.PropertyType, value)
-                });
-
-                setClauses.Add($"{columnName} = {paramName}");
-                insertColumns.Add(columnName);
-                insertValues.Add(paramName);
-            }
-        }
-
-        if (exists)
-        {
-            var updateSql = $"UPDATE {tableName} SET {string.Join(", ", setClauses)} WHERE {idColumnName} = @p_id";
-            dbContext.Database.ExecuteSqlRaw(updateSql, parameters.ToArray());
-        }
-        else
-        {
-            var insertSql = $"INSERT INTO {tableName} ({string.Join(", ", insertColumns)}) " +
-                          $"VALUES ({string.Join(", ", insertValues)})";
-            dbContext.Database.ExecuteSqlRaw(insertSql, parameters.ToArray());
-        }
-
-        dbContext.SaveChanges();
-    }
-    catch (Exception e)
-    {
-        Console.Error.WriteLine($"Error saving entity: {e.Message}");
-        Console.Error.WriteLine(e.StackTrace);
-    }
-}
-
-private NpgsqlDbType GetNpgsqlDbType(Type type)
-{
-    // Handle nullable types
-    type = Nullable.GetUnderlyingType(type) ?? type;
-
-    if (type == typeof(int)) return NpgsqlDbType.Integer;
-    if (type == typeof(long)) return NpgsqlDbType.Bigint;
-    if (type == typeof(string)) return NpgsqlDbType.Text;
-    if (type == typeof(DateTime)) return NpgsqlDbType.Timestamp;
-    if (type == typeof(bool)) return NpgsqlDbType.Boolean;
-    if (type == typeof(decimal)) return NpgsqlDbType.Numeric;
-    if (type == typeof(double)) return NpgsqlDbType.Double;
-    if (type == typeof(Guid)) return NpgsqlDbType.Uuid;
     
-    throw new NotSupportedException($"Type {type.Name} not mapped to NpgsqlDbType");
-}
+   public void SaveOrUpdateEntity(SaveOrUpdateContext context)
+   {
+       try
+       {
+           context.Id = long.Parse(context.Document.Id);
+           context.Data = context.Document.ToDictionary();
+
+           var entityType = context.DbContext.Model.FindEntityType(context.EntityClass);
+           context.TableName = entityType.GetTableName();
+           context.IdColumnName = GetPrimaryKeyColumnName(context);
+
+           if (context.TableName.CompareTo("user_validation") == 0)
+           {
+               HandleUserValidation(context);
+               return;
+           }
+
+           bool exists = EntityExists(context);
+
+           var parameters = new List<NpgsqlParameter> { new NpgsqlParameter("p_id", NpgsqlDbType.Bigint) { Value = context.Id } };
+           var setClauses = new List<string>();
+           var insertColumns = new List<string> { context.IdColumnName };
+           var insertValues = new List<string> { "@p_id" };
+
+           PrepareEntityParameters(context, parameters, setClauses, insertColumns, insertValues);
+
+           if (exists)
+           {
+               UpdateEntity(context, setClauses, parameters);
+           }
+           else
+           {
+               InsertEntity(context, insertColumns, insertValues, parameters);
+           }
+
+           context.DbContext.SaveChanges();
+       }
+       catch (Exception e)
+       {
+           Console.Error.WriteLine($"Error saving entity: {e.Message}");
+           Console.Error.WriteLine(e.StackTrace);
+       }
+   }
+   private void HandleUserValidation(SaveOrUpdateContext context)
+   {
+       var configuration = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
+       var mapper = new Mapper(configuration);
+
+       UserInscriptionDTO person = mapper.Map<Dictionary<string, object>, UserInscriptionDTO>(context.Data);
+       UserValidation userValidation = _userService.SignUpUser(person);
+       _emailService.SendEmailAsync("Cloud", person.Email, "Confirmation Compte", EmailHelper.GetValidationEmail(userValidation.Id));
+   }
+   private string GetPrimaryKeyColumnName(SaveOrUpdateContext context)
+   {
+       var entityType = context.DbContext.Model.FindEntityType(context.EntityClass);
+       return entityType.FindPrimaryKey().Properties.First().GetColumnName();
+   }
+   private bool EntityExists(SaveOrUpdateContext context)
+   {
+       using (var command = context.DbContext.Database.GetDbConnection().CreateCommand())
+       {
+           command.CommandText = $"SELECT COUNT(*) FROM {context.TableName} WHERE {context.IdColumnName} = @p0";
+           command.Parameters.Add(new NpgsqlParameter("p0", NpgsqlDbType.Bigint) { Value = context.Id });
+
+           context.DbContext.Database.OpenConnection();
+           return Convert.ToInt32(command.ExecuteScalar()) > 0;
+       }
+   }
+   private void PrepareEntityParameters(SaveOrUpdateContext context, List<NpgsqlParameter> parameters,
+       List<string> setClauses, List<string> insertColumns, List<string> insertValues)
+   {
+       foreach (var property in context.EntityClass.GetProperties())
+       {
+           if (property.GetCustomAttribute<KeyAttribute>() != null) continue;
+
+           var columnAttr = property.GetCustomAttribute<ColumnAttribute>();
+           var columnName = columnAttr?.Name ?? property.Name;
+
+           if (context.Data.TryGetValue(property.Name, out object value))
+           {
+               var paramName = $"@p_{columnName}";
+               parameters.Add(new NpgsqlParameter(paramName, GetNpgsqlDbType(property.PropertyType))
+               {
+                   Value = ConvertValue(property.PropertyType, value)
+               });
+
+               setClauses.Add($"{columnName} = {paramName}");
+               insertColumns.Add(columnName);
+               insertValues.Add(paramName);
+           }
+       }
+   }
+   private void UpdateEntity(SaveOrUpdateContext context, List<string> setClauses, List<NpgsqlParameter> parameters)
+   {
+       var updateSql = $"UPDATE {context.TableName} SET {string.Join(", ", setClauses)} WHERE {context.IdColumnName} = @p_id";
+       context.DbContext.Database.ExecuteSqlRaw(updateSql, parameters.ToArray());
+   }
+   private void InsertEntity(SaveOrUpdateContext context, List<string> insertColumns, List<string> insertValues,
+       List<NpgsqlParameter> parameters)
+   {
+       var insertSql = $"INSERT INTO {context.TableName} ({string.Join(", ", insertColumns)}) " +
+                       $"VALUES ({string.Join(", ", insertValues)})";
+       context.DbContext.Database.ExecuteSqlRaw(insertSql, parameters.ToArray());
+   }
+
+    private NpgsqlDbType GetNpgsqlDbType(Type type)
+    {
+        type = Nullable.GetUnderlyingType(type) ?? type;
+
+        if (type == typeof(int)) return NpgsqlDbType.Integer;
+        if (type == typeof(long)) return NpgsqlDbType.Bigint;
+        if (type == typeof(string)) return NpgsqlDbType.Text;
+        if (type == typeof(DateTime)) return NpgsqlDbType.Timestamp;
+        if (type == typeof(bool)) return NpgsqlDbType.Boolean;
+        if (type == typeof(decimal)) return NpgsqlDbType.Numeric;
+        if (type == typeof(double)) return NpgsqlDbType.Double;
+        if (type == typeof(Guid)) return NpgsqlDbType.Uuid;
+        
+        throw new NotSupportedException($"Type {type.Name} not mapped to NpgsqlDbType");
+    }
 
     private void DeleteEntity(Type entityClass, DocumentSnapshot document,AppDbContext dbContext)
     {
@@ -357,14 +361,4 @@ private NpgsqlDbType GetNpgsqlDbType(Type type)
         }
         _activeListeners.Clear();
     }
-
-    // // Example usage
-    // public static async Task Demo()
-    // {
-    //     var listener = new FirestoreUniversalListener("your-project", "service-account.json");
-    //     await listener.StartUniversalListeningAsync();
-    //     Console.WriteLine("Listening to all Firestore changes. Press any key to exit...");
-    //     Console.ReadKey();
-    //     await listener.StopAllListenersAsync();
-    // }
 }
