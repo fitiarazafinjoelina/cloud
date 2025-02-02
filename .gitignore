@@ -6,3 +6,4 @@ riderModule.iml
 .idea/
 *.nupkg
 .nuget/
+service-account.json
