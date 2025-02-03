@@ -16,7 +16,7 @@ public class LocalToFirestoreSync
         _firestore = firestore;
         _syncTables = configuration.GetSection("sync:tables").Get<List<string>>();
         _dbContext = dbContext;
-    }
+    }   
     private Dictionary<string, object> ConvertEntity(object entity)
     {
         var result = new Dictionary<string, object>();

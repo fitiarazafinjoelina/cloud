@@ -47,7 +47,7 @@ public class FirestoreUniversalListener
             Credential = GoogleCredential.FromFile(credentialsPath)
         });
         _syncTables = configuration.GetSection("sync:tables").Get<List<string>>();
-        _db = FirestoreDb.Create(projectId);
+        _db = FirestoreConfig.GetFirestoreDbAsync().Result;
         _activeListeners = new ConcurrentDictionary<string, FirestoreChangeListener>();
         _cts = new CancellationTokenSource();
         _serviceScopeFactory = serviceScopeFactory;
@@ -159,18 +159,29 @@ public class FirestoreUniversalListener
    {
        try
        {
-           context.Id = long.Parse(context.Document.Id);
+           try
+           {
+               context.Id = long.Parse(context.Document.Id);
+           }
+           catch (Exception e)
+           {
+               
+           }
            context.Data = context.Document.ToDictionary();
 
            var entityType = context.DbContext.Model.FindEntityType(context.EntityClass);
            context.TableName = entityType.GetTableName();
            context.IdColumnName = GetPrimaryKeyColumnName(context);
-
+           
            if (context.TableName.CompareTo("user_validation") == 0)
            {
                HandleUserValidation(context);
                return;
            }
+           
+           var primaryKeyProperty = entityType.FindPrimaryKey()?.Properties.FirstOrDefault();
+           context.Id = Convert.ToInt64(context.Document.GetType().GetProperty(context.IdColumnName)?.GetValue(context.Document));
+           Console.WriteLine("ID:"+context.Id);
 
            bool exists = EntityExists(context);
 

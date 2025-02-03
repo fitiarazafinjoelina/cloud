@@ -11,7 +11,10 @@ using cloud.pin;
 using cloud.user;
 using cloud.userValidation;
 using cloud.uniqIdentifier;
+using Google.Api.Gax;
 using Google.Cloud.Firestore;
+using Google.Cloud.Firestore.V1;
+using Grpc.Core;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -68,67 +71,106 @@ builder.Services.AddScoped<Func<AppDbContext>>(provider => provider.GetRequiredS
 //     {
    builder.Services.AddSingleton<FirestoreUniversalListener>(provider => 
      new FirestoreUniversalListener(
-         "test-firebase-1e6b6",
+         "demo",
          "service-account.json",
          provider.GetRequiredService<IConfiguration>(),
          provider.GetRequiredService<IServiceScopeFactory>()
      ));
-
+   // var client = await FirestoreConfig.GetFirestoreDbAsync();
+   // var db = client;
+   //
+   // try
+   // {
+   //     var docRef = db.Collection("test").Document("debug");
+   //     await docRef.SetAsync(new { Test = "Connection Test" }); 
+   //     Console.WriteLine("Successfully wrote to emulator!");
+   // }
+   // catch (Exception ex)
+   // {
+   //     Console.WriteLine(ex.StackTrace);
+   //     Console.WriteLine($"Error: {ex.Message}");
+   // }
 
         // Register the background service
-        builder.Services.AddHostedService<FirestoreBackgroundService>();
+        // builder.Services.AddHostedService<FirestoreBackgroundService>();
     // })
     // .Build();
 
 // await host.RunAsync();
 
-string pathToServiceAccount = "service-account.json";
-Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", pathToServiceAccount);
-builder.Services.AddSingleton<FirestoreDb>(provider => FirestoreDb.Create("test-firebase-1e6b6"));
-Console.WriteLine("Created Cloud Firestore client with project ID: {0}", "test-firebase-1e6b6");
+// if (builder.Environment.IsDevelopment())
+// {
+    // Set Firestore emulator URL for local development
+    string emulatorHost = "127.0.0.1:8082"; // Default is 8080
+    Environment.SetEnvironmentVariable("FIRESTORE_EMULATOR_HOST", emulatorHost);
+    Console.WriteLine("Using local Firestore emulator at localhost:8082");
+    // }
 
-var app = builder.Build();
+    string pathToServiceAccount = "service-account.json";
+    // Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "C:\\dummy-credentiels.json");
+    // builder.Services.AddSingleton<FirestoreDb>(provider =>
+    // {
+    //     FirestoreClient client = new FirestoreClientBuilder
+    //     {
+    //         Endpoint = "localhost:8082",
+    //         ChannelCredentials = ChannelCredentials.Insecure
+    //     }.Build();
+    //     return FirestoreDb.Create("test-firebase-1e6b6", client);
+    // });
+    // Console.WriteLine("Created Cloud Firestore client with project ID: {0}", "test-firebase-1e6b6");
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
+    builder.Services.AddSingleton<FirestoreDb>(provider =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        c.RoutePrefix = string.Empty; // Set this to '/' if Swagger is the homepage
+        var client = new FirestoreDbBuilder()
+        {
+            ProjectId = "demo-project-id",
+            EmulatorDetection = EmulatorDetection.EmulatorOnly,
+            ChannelCredentials = Grpc.Core.ChannelCredentials.Insecure,
+        }.Build();
+        return client;
     });
-}
+   
 
-// app.UseHttpsRedirection();
-app.UseAuthorization();
+    var app = builder.Build();
 
-app.MapControllers();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
+    if (app.Environment.IsDevelopment())
     {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            c.RoutePrefix = string.Empty; 
+        });
+    }
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    var summaries = new[]
+    {
+        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+    };
+
+    app.MapGet("/weatherforecast", () =>
+        {
+            var forecast = Enumerable.Range(1, 5).Select(index =>
+                    new WeatherForecast
+                    (
+                        DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                        Random.Shared.Next(-20, 55),
+                        summaries[Random.Shared.Next(summaries.Length)]
+                    ))
+                .ToArray();
+            return forecast;
+        })
+        .WithName("GetWeatherForecast")
+        .WithOpenApi();
 
 
-app.Run();
+    app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+    record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+    {
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
