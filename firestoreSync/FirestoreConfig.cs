@@ -23,10 +23,6 @@ public class FirestoreConfig
                 ProjectId = "demo",
                 EmulatorDetection = EmulatorDetection.EmulatorOnly,
             }.Build();
-            CollectionReference collection = firestoreDb.Collection("test_collection");
-            DocumentReference document = collection.Document("test_document");
-            await document.SetAsync(new { message = "Hello from the emulator!" });
-            Console.WriteLine("Document added successfully!");
         }
         else
         {

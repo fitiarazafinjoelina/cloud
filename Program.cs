@@ -101,9 +101,9 @@ builder.Services.AddScoped<Func<AppDbContext>>(provider => provider.GetRequiredS
 // if (builder.Environment.IsDevelopment())
 // {
     // Set Firestore emulator URL for local development
-    string emulatorHost = "127.0.0.1:8082"; // Default is 8080
-    Environment.SetEnvironmentVariable("FIRESTORE_EMULATOR_HOST", emulatorHost);
-    Console.WriteLine("Using local Firestore emulator at localhost:8082");
+    // string emulatorHost = "127.0.0.1:8082"; // Default is 8080
+    // Environment.SetEnvironmentVariable("FIRESTORE_EMULATOR_HOST", emulatorHost);
+    // Console.WriteLine("Using local Firestore emulator at localhost:8082");
     // }
 
     string pathToServiceAccount = "service-account.json";
@@ -121,13 +121,7 @@ builder.Services.AddScoped<Func<AppDbContext>>(provider => provider.GetRequiredS
 
     builder.Services.AddSingleton<FirestoreDb>(provider =>
     {
-        var client = new FirestoreDbBuilder()
-        {
-            ProjectId = "demo-project-id",
-            EmulatorDetection = EmulatorDetection.EmulatorOnly,
-            ChannelCredentials = Grpc.Core.ChannelCredentials.Insecure,
-        }.Build();
-        return client;
+        return FirestoreConfig.GetFirestoreDbAsync().Result;
     });
    
 

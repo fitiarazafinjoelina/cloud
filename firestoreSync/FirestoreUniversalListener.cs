@@ -42,10 +42,10 @@ public class FirestoreUniversalListener
     private UserService _userService;
     public FirestoreUniversalListener(string projectId, string credentialsPath, IConfiguration configuration, IServiceScopeFactory serviceScopeFactory)
     {
-        FirebaseApp.Create(new AppOptions
-        {
-            Credential = GoogleCredential.FromFile(credentialsPath)
-        });
+        // FirebaseApp.Create(new AppOptions
+        // {
+        //     Credential = GoogleCredential.FromFile(credentialsPath)
+        // });
         _syncTables = configuration.GetSection("sync:tables").Get<List<string>>();
         _db = FirestoreConfig.GetFirestoreDbAsync().Result;
         _activeListeners = new ConcurrentDictionary<string, FirestoreChangeListener>();
