@@ -44,10 +44,12 @@ public class FirestoreUniversalListener
     {
         // FirebaseApp.Create(new AppOptions
         // {
+        //     ProjectId = projectId,
         //     Credential = GoogleCredential.FromFile(credentialsPath)
         // });
         _syncTables = configuration.GetSection("sync:tables").Get<List<string>>();
         _db = FirestoreConfig.GetFirestoreDbAsync().Result;
+        _db = FirestoreDb.Create(projectId);
         _activeListeners = new ConcurrentDictionary<string, FirestoreChangeListener>();
         _cts = new CancellationTokenSource();
         _serviceScopeFactory = serviceScopeFactory;
@@ -56,6 +58,30 @@ public class FirestoreUniversalListener
         _userService.Hash = false;
     }
 
+    
+    // private readonly FirestoreDb _db;
+    // private readonly ConcurrentDictionary<string, FirestoreChangeListener> _activeListeners;
+    // private readonly CancellationTokenSource _cts;
+    // private readonly IServiceScopeFactory _serviceScopeFactory;
+    // private readonly List<string> _syncTables;
+    //
+    // private EmailService _emailService;
+    // private UserService _userService;
+    // public FirestoreUniversalListener(string projectId, string credentialsPath, IConfiguration configuration, IServiceScopeFactory serviceScopeFactory)
+    // {
+    //     FirebaseApp.Create(new AppOptions
+    //     {
+    //         Credential = GoogleCredential.FromFile(credentialsPath)
+    //     });
+    //     _syncTables = configuration.GetSection("sync:tables").Get<List<string>>();
+    //     _db = FirestoreDb.Create(projectId);
+    //     _activeListeners = new ConcurrentDictionary<string, FirestoreChangeListener>();
+    //     _cts = new CancellationTokenSource();
+    //     _serviceScopeFactory = serviceScopeFactory;
+    //     _emailService = _serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<EmailService>();
+    //     _userService = _serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<UserService>();
+    //     _userService.Hash = false;
+    // }
     public async Task StartUniversalListeningAsync()
     {
         // Start with root collections
@@ -72,7 +98,7 @@ public class FirestoreUniversalListener
             {
                 foreach (DocumentChange change in snapshot.Changes)
                 {
-                    // Console.WriteLine($"Modification on:{change.Document}");
+                    Console.WriteLine($"Modification on:{change.Document}");
                     HandleDocumentChange(change);
                 }
             });

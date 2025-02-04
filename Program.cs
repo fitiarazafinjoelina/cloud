@@ -60,6 +60,35 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //     var configuration = provider.GetRequiredService<IConfiguration>();
 //     return new FirestoreToLocalSyncing(firestore, configuration, dbContextFactory);
 // });
+
+
+string pathToServiceAccount = "service-account.json";
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", pathToServiceAccount);
+// builder.Services.AddSingleton<FirestoreDb>(provider =>
+// {
+//     FirestoreClient client = new FirestoreClientBuilder
+//     {
+//         Endpoint = "localhost:8082",
+//         ChannelCredentials = ChannelCredentials.Insecure
+//     }.Build();
+//     return FirestoreDb.Create("test-firebase-1e6b6", client);
+// });
+// Console.WriteLine("Created Cloud Firestore client with project ID: {0}", "test-firebase-1e6b6");
+
+builder.Services.AddSingleton<FirestoreDb>(provider =>
+{
+    return FirestoreConfig.GetFirestoreDbAsync().Result;
+});
+
+
+
+builder.Services.AddSingleton<FirestoreUniversalListener>(provider => 
+    new FirestoreUniversalListener(
+        "cloud-syncing",
+        "service-account.json",
+        provider.GetRequiredService<IConfiguration>(),
+        provider.GetRequiredService<IServiceScopeFactory>()
+    ));
 // builder.Services.AddHostedService<FirestoreToLocalSyncing>();
 
 // Register the factory to resolve AppDbContext
@@ -69,15 +98,9 @@ builder.Services.AddScoped<Func<AppDbContext>>(provider => provider.GetRequiredS
 // var host = Host.CreateDefaultBuilder(args)
 //     .ConfigureServices((context, services) =>
 //     {
-   builder.Services.AddSingleton<FirestoreUniversalListener>(provider => 
-     new FirestoreUniversalListener(
-         "demo",
-         "service-account.json",
-         provider.GetRequiredService<IConfiguration>(),
-         provider.GetRequiredService<IServiceScopeFactory>()
-     ));
-   // var client = await FirestoreConfig.GetFirestoreDbAsync();
-   // var db = client;
+// var client = await FirestoreConfig.GetFirestoreDbAsync();
+// var db = client;
+   
    //
    // try
    // {
@@ -92,7 +115,7 @@ builder.Services.AddScoped<Func<AppDbContext>>(provider => provider.GetRequiredS
    // }
 
         // Register the background service
-        // builder.Services.AddHostedService<FirestoreBackgroundService>();
+        builder.Services.AddHostedService<FirestoreBackgroundService>();
     // })
     // .Build();
 
@@ -106,25 +129,7 @@ builder.Services.AddScoped<Func<AppDbContext>>(provider => provider.GetRequiredS
     // Console.WriteLine("Using local Firestore emulator at localhost:8082");
     // }
 
-    string pathToServiceAccount = "service-account.json";
-    // Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "C:\\dummy-credentiels.json");
-    // builder.Services.AddSingleton<FirestoreDb>(provider =>
-    // {
-    //     FirestoreClient client = new FirestoreClientBuilder
-    //     {
-    //         Endpoint = "localhost:8082",
-    //         ChannelCredentials = ChannelCredentials.Insecure
-    //     }.Build();
-    //     return FirestoreDb.Create("test-firebase-1e6b6", client);
-    // });
-    // Console.WriteLine("Created Cloud Firestore client with project ID: {0}", "test-firebase-1e6b6");
-
-    builder.Services.AddSingleton<FirestoreDb>(provider =>
-    {
-        return FirestoreConfig.GetFirestoreDbAsync().Result;
-    });
-   
-
+ 
     var app = builder.Build();
 
     if (app.Environment.IsDevelopment())

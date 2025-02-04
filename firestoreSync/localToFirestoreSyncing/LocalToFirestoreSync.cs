@@ -57,6 +57,7 @@ public class LocalToFirestoreSync
                     break;
 
                 case Operation.Delete:
+                    Console.WriteLine("Deleting...");
                     await docRef.DeleteAsync();
                     break;
             }

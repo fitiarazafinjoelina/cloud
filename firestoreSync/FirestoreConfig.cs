@@ -11,7 +11,7 @@ public class FirestoreConfig
 {
     public static async Task<FirestoreDb> GetFirestoreDbAsync()
     {
-        const string emulatorHost = "127.0.0.1:8082";
+        const string emulatorHost = "172.23.160.1:8082";
         Environment.SetEnvironmentVariable("FIRESTORE_EMULATOR_HOST", emulatorHost);
 
         FirestoreDb firestoreDb;
@@ -28,12 +28,12 @@ public class FirestoreConfig
         {
             Console.WriteLine("Using real Firestore...");
             
-            var defaultApp = FirebaseApp.Create(new AppOptions()
-            {
-                Credential = GoogleCredential.GetApplicationDefault(),
-                ProjectId = "demo"
-            });
-            firestoreDb = FirestoreDb.Create("demo");
+            // var defaultApp = FirebaseApp.Create(new AppOptions()
+            // {
+            //     Credential = GoogleCredential.GetApplicationDefault(),
+            //     ProjectId = "cloud-syncing"
+            // });
+            firestoreDb = FirestoreDb.Create("cloud-syncing");
         }
 
         return firestoreDb;
