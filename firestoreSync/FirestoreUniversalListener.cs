@@ -255,8 +255,6 @@ public class FirestoreUniversalListener
            {
                InsertEntity(context, insertColumns, insertValues, parameters);
            }
-
-
            context.DbContext.SaveChanges();
        }
        catch (Exception e)
@@ -363,7 +361,7 @@ public class FirestoreUniversalListener
         {
             var entity = Activator.CreateInstance(entityClass);
             var idProperty = GetFieldPK(entity);
-            idProperty.SetValue(entity, long.Parse(document.Id));
+            // idProperty.SetValue(entity, Convert.ToInt32(document.ToDictionary()[idProperty.Name]));
             dbContext.Remove(entity);
             dbContext.SaveChanges();
         }
