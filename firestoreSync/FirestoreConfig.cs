@@ -11,8 +11,8 @@ public class FirestoreConfig
 {
     public static async Task<FirestoreDb> GetFirestoreDbAsync()
     {
-        const string emulatorHost = "172.23.160.1:8082";
-        Environment.SetEnvironmentVariable("FIRESTORE_EMULATOR_HOST", emulatorHost);
+        // const string emulatorHost = "172.23.160.1:8082";
+        // Environment.SetEnvironmentVariable("FIRESTORE_EMULATOR_HOST", emulatorHost);
 
         FirestoreDb firestoreDb;
         if (Environment.GetEnvironmentVariable("FIRESTORE_EMULATOR_HOST") != null)

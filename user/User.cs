@@ -20,5 +20,6 @@ public class User {
 
     [Column("nb_tentative")]
     public int NbTentative { get; set; }
-
+    [Column("url_photo")]
+    public string UrlPhoto { get; set; }
 }

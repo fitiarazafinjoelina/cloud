@@ -8,6 +8,7 @@ using cloud.helper;
 using cloud.user;
 using cloud.userValidation;
 using Google.Apis.Auth.OAuth2;
+using Google.Type;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Npgsql;
@@ -27,7 +28,7 @@ public class SaveOrUpdateContext
     public AppDbContext DbContext { get; set; }
     public string TableName { get; set; }
     public string IdColumnName { get; set; }
-    public long Id { get; set; }
+    public int Id { get; set; }
     public Dictionary<string, object> Data { get; set; }
 }
 
@@ -42,11 +43,11 @@ public class FirestoreUniversalListener
     private UserService _userService;
     public FirestoreUniversalListener(string projectId, string credentialsPath, IConfiguration configuration, IServiceScopeFactory serviceScopeFactory)
     {
-        // FirebaseApp.Create(new AppOptions
-        // {
-        //     ProjectId = projectId,
-        //     Credential = GoogleCredential.FromFile(credentialsPath)
-        // });
+        FirebaseApp.Create(new AppOptions
+        {
+            ProjectId = projectId,
+            Credential = GoogleCredential.FromFile(credentialsPath)
+        });
         _syncTables = configuration.GetSection("sync:tables").Get<List<string>>();
         _db = FirestoreConfig.GetFirestoreDbAsync().Result;
         _db = FirestoreDb.Create(projectId);
@@ -92,21 +93,33 @@ public class FirestoreUniversalListener
     {
         foreach (var collection in collections)
         {
-            if (_activeListeners.ContainsKey(collection.Path)) continue;
+            Console.WriteLine("Processing collection: " + collection.Path);
 
-            var listener = collection.Listen(async snapshot =>
+            if (_activeListeners.ContainsKey(collection.Path))
+                continue;
+
+            try
             {
-                foreach (DocumentChange change in snapshot.Changes)
+                var listener = collection.Listen(async snapshot =>
                 {
-                    Console.WriteLine($"Modification on:{change.Document}");
-                    HandleDocumentChange(change);
-                }
-            });
+                    foreach (DocumentChange change in snapshot.Changes)
+                    {
+                        Console.WriteLine($"Modification on:{change.Document}");
+                        HandleDocumentChange(change);
+                    }
+                });
 
-            _activeListeners.TryAdd(collection.Path, listener);
+                _activeListeners.TryAdd(collection.Path, listener);
+
+                Console.WriteLine("Listener added for collection: " + collection.Path);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error adding listener for {collection.Path}: {ex.Message}");
+            }
 
             // Process existing documents in collection
-            // await ProcessDocumentsInCollection(collection);
+            await ProcessDocumentsInCollection(collection);
         }
     }
 
@@ -187,7 +200,7 @@ public class FirestoreUniversalListener
        {
            try
            {
-               context.Id = long.Parse(context.Document.Id);
+               context.Id = Convert.ToInt32(context.Document.Id);
            }
            catch (Exception e)
            {
@@ -199,17 +212,33 @@ public class FirestoreUniversalListener
            context.TableName = entityType.GetTableName();
            context.IdColumnName = GetPrimaryKeyColumnName(context);
            
+           Console.WriteLine("Primary key field is:"+context.IdColumnName);
            if (context.TableName.CompareTo("user_validation") == 0)
            {
                HandleUserValidation(context);
                return;
            }
-           
            var primaryKeyProperty = entityType.FindPrimaryKey()?.Properties.FirstOrDefault();
-           context.Id = Convert.ToInt64(context.Document.GetType().GetProperty(context.IdColumnName)?.GetValue(context.Document));
-           Console.WriteLine("ID:"+context.Id);
+           var primaryKeyValue = context.Document.ToDictionary().GetValueOrDefault(primaryKeyProperty?.Name);
+           if (primaryKeyValue != null)
+           {               
+               Console.WriteLine($"ID value: {context.Id}");
+               context.Id = Convert.ToInt32(primaryKeyValue);
+               Console.WriteLine($"Converted ID: {context.Id}");
+           }
+           else
+           {
+               Console.WriteLine("Primary key value is missing or null in the document.");
+               context.Id = 0;
+           }
+           foreach (var property in context.Document.ToDictionary())
+           {
+               
+               Console.WriteLine($"{property.Key}: {property.Value}");
+           }
+           Console.WriteLine("ID:" + context.Id);
 
-           bool exists = EntityExists(context);
+           bool exists = context.Id != 0 && EntityExists(context); 
 
            var parameters = new List<NpgsqlParameter> { new NpgsqlParameter("p_id", NpgsqlDbType.Bigint) { Value = context.Id } };
            var setClauses = new List<string>();
@@ -226,6 +255,7 @@ public class FirestoreUniversalListener
            {
                InsertEntity(context, insertColumns, insertValues, parameters);
            }
+
 
            context.DbContext.SaveChanges();
        }
@@ -272,12 +302,20 @@ public class FirestoreUniversalListener
 
            if (context.Data.TryGetValue(property.Name, out object value))
            {
+               if (value == null)
+               {
+                   value = DBNull.Value;
+               }
+               
+               if (value is Google.Cloud.Firestore.Timestamp timestamp)
+               {
+                   value = timestamp.ToDateTime().ToUniversalTime();
+               }
                var paramName = $"@p_{columnName}";
                parameters.Add(new NpgsqlParameter(paramName, GetNpgsqlDbType(property.PropertyType))
                {
                    Value = ConvertValue(property.PropertyType, value)
                });
-
                setClauses.Add($"{columnName} = {paramName}");
                insertColumns.Add(columnName);
                insertValues.Add(paramName);
@@ -292,6 +330,12 @@ public class FirestoreUniversalListener
    private void InsertEntity(SaveOrUpdateContext context, List<string> insertColumns, List<string> insertValues,
        List<NpgsqlParameter> parameters)
    {
+       if (context.Id == 0)
+       {
+           insertColumns.Remove(context.IdColumnName); 
+           insertValues.Remove($"@p_id");
+           Console.WriteLine("ID is 0, allowing the database to auto-generate the key.");
+       }
        var insertSql = $"INSERT INTO {context.TableName} ({string.Join(", ", insertColumns)}) " +
                        $"VALUES ({string.Join(", ", insertValues)})";
        context.DbContext.Database.ExecuteSqlRaw(insertSql, parameters.ToArray());
@@ -319,7 +363,6 @@ public class FirestoreUniversalListener
         {
             var entity = Activator.CreateInstance(entityClass);
             var idProperty = GetFieldPK(entity);
-            
             idProperty.SetValue(entity, long.Parse(document.Id));
             dbContext.Remove(entity);
             dbContext.SaveChanges();
@@ -366,10 +409,14 @@ public class FirestoreUniversalListener
         }
         if (targetType == typeof(DateTime) || targetType == typeof(DateTime?))
         {
+            Console.WriteLine( value.GetType().ToString());
             if (value is string dateString)
             {
+                Console.WriteLine($"Est date string:{dateString}");
                 if (DateTime.TryParse(dateString, out var date))
                 {
+                    Console.WriteLine(date);
+                    date = (DateTime.SpecifyKind((DateTime) value,DateTimeKind.Local));
                     return date;
                 }
                 else
@@ -379,10 +426,12 @@ public class FirestoreUniversalListener
             }
             if (value is DateTime)
             {
+                value = (DateTime.SpecifyKind((DateTime) value,DateTimeKind.Local));
                 return (DateTime)value;
             }
             if (value is DateTime?)
             {
+                value = (DateTime.SpecifyKind((DateTime) value,DateTimeKind.Local));
                 return (DateTime?)value;
             }
         }
