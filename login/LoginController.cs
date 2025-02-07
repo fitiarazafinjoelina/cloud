@@ -27,10 +27,10 @@ public class LoginController:ControllerBase
         ResponseBody response = new ResponseBody();
         try
         {
-            LoginPinDTO loginPinDto = loginService.login(login);
-            string user =loginPinDto.ToString();
+            // LoginPinDTO loginPinDto = loginService.login(login);
+            // string user =loginPinDto.ToString();
             
-            // string user = loginService.login(login).ToString();
+            string user = loginService.login(login).ToString();
             response.StatusCode = 200;
             response.Data = "Success";
             response.Message = "";
