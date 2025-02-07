@@ -54,7 +54,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 
-string pathToServiceAccount = "service-account.json";
+string pathToServiceAccount = "service-account2.json";
 Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", pathToServiceAccount);
 
 builder.Services.AddSingleton<FirestoreDb>(provider =>
@@ -66,8 +66,9 @@ builder.Services.AddSingleton<FirestoreDb>(provider =>
 
 builder.Services.AddSingleton<FirestoreUniversalListener>(provider => 
 new FirestoreUniversalListener(
-    "cloud-syncing",
-    "service-account.json",
+    // "cloud-syncing",
+    "test-firebase-1e6b6",
+    "service-account2.json",
     provider.GetRequiredService<IConfiguration>(),
     provider.GetRequiredService<IServiceScopeFactory>()
 ));

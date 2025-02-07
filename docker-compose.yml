@@ -8,6 +8,8 @@
       - "8081:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - cloud-network
     depends_on:
       - database
 
@@ -17,6 +19,8 @@
     restart: always
     ports:
       - "5433:5432"
+    networks:
+      - cloud-network
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
@@ -27,3 +31,8 @@
 
 volumes:
   postgres_data:
+
+networks:
+  cloud-network:  # Define the network
+    name: cloud-network
+    driver: bridge
