@@ -33,7 +33,7 @@ public class FirestoreConfig
             //     Credential = GoogleCredential.GetApplicationDefault(),
             //     ProjectId = "cloud-syncing"
             // });
-            firestoreDb = FirestoreDb.Create("cloud-syncing");
+            firestoreDb = FirestoreDb.Create("test-firebase-1e6b6");
         }
 
         return firestoreDb;
