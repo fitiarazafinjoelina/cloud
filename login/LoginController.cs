@@ -27,13 +27,17 @@ public class LoginController:ControllerBase
         ResponseBody response = new ResponseBody();
         try
         {
-            string user = loginService.login(login).ToString();
+            LoginPinDTO loginPinDto = loginService.login(login);
+            string user =loginPinDto.ToString();
+            
+            // string user = loginService.login(login).ToString();
             response.StatusCode = 200;
             response.Data = "Success";
             response.Message = "";
             // Console.WriteLine(user);
             // request.Headers.Add("Authorization", "YourCustomTokenHere");
             Response.Headers.Authorization = user;
+            
             // _client.DefaultRequestHeaders.Add("Authorization",user);
         }
         catch (Exception e)

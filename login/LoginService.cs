@@ -28,7 +28,7 @@ public class LoginService
     }
 
 
-    public string login(LoginDTO login)
+    public LoginPinDTO login(LoginDTO login)
     {
         User user = _context.Users.FirstOrDefault(u => u.Email == login.Email);
         if (user == null)
@@ -57,7 +57,11 @@ public class LoginService
         userToken.user = user;
         Pin pin = _pinService.CreatePin(userToken.user.IdUser).Result;
         _emailService.SendEmailOtpAsync("Admin",user.Email,pin.PinNumber.ToString());
-        return userToken.token;
+        return new LoginPinDTO()
+        {
+            PinToken = userToken.token,
+            Pin = pin.PinNumber
+        };
     }
 
     public string pin(string token, string pin)
