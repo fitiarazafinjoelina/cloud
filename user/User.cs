@@ -8,6 +8,10 @@ public class User {
     [Key]
     [Column("id_user_cloud")]
     public int IdUser { get; set; }
+    
+    // [Column("uid")]
+    [NotMapped]
+    public string? Uid { get; set; }
 
     [Column("email")]
     public string Email { get; set; }
@@ -20,5 +24,10 @@ public class User {
 
     [Column("nb_tentative")]
     public int NbTentative { get; set; }
+    
+    [Column("verified")]
+    public bool Verified { get; set; }
 
+    [Column(name: "token" )] 
+    public string? Token { get; set; }
 }

@@ -44,4 +44,12 @@ public class PasswordHelper
         // Compare the computed hash with the stored hash securely
         return CryptographicOperations.FixedTimeEquals(computedHash, storedHashBytes);
     }
+
+    // public static void Main()
+    // {
+    //     string password = "nicolus";
+    //     string hashPassword = PasswordHelper.HashPassword(password);
+    //     
+    //     Console.WriteLine("Password match " + VerifyPassword(hashPassword, "tGBXB7HFDKQgxp4pf7zqo5U8j8ouQKczHL5PAuzFL8wBxOAqidD7NKcD9cHIJl0Hc4Ol9nfIy3diNgLXXSQYPQ=="));
+    // }
 }

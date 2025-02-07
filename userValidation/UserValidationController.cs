@@ -21,7 +21,7 @@ public class UserValidationController {
     public async Task<ResponseBody> Validate(int id) {
         ResponseBody response = new ResponseBody();
         try {
-            User user = _userValidationService.ValidateUser(id);
+            User user = await _userValidationService.ValidateUser(id);
 
             // UserValidation? userValidation = _context.UserValidations.FirstOrDefault(u => u.Id == id);
             // if (userValidation == null) {
@@ -40,7 +40,7 @@ public class UserValidationController {
             // _context.SaveChanges();
 
             response.StatusCode = 200;
-            response.Data = new { IdUser = id };
+            // response.Data = new { uid = uid };
             response.Message = $"Cher {user.Username},  Votre Compte a ete bien confirme";
         }
         catch (Exception e) {

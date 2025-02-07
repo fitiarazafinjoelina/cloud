@@ -8,3 +8,9 @@ public class UserToken
     public User user;
     public string token;
 }
+
+public class UserTokenDTO
+{
+    public string Uid { get; set; }
+    public string Token { get; set; }
+}

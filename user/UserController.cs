@@ -34,7 +34,7 @@ public class UserController: ControllerBase {
             responseBody.Data = new {
                 Email = user.Email,
                 Username = user.Username,
-                Password = user.Password
+                // Password = user.Password
             };
         }
         catch (Exception e) {
@@ -52,8 +52,8 @@ public class UserController: ControllerBase {
         ResponseBody body = new ResponseBody();
 
         try {
-            UserValidation userValidation = _userService.SignUpUser(userInscriptionDto);
-            await _emailService.SendEmailAsync("Cloud", userInscriptionDto.Email, "Confirmation Compte", EmailHelper.GetValidationEmail(userValidation.Id));
+            UserValidation userValidation = await _userService.SignUpUser(userInscriptionDto);
+            await _emailService.SendEmailAsync("Cloud", userInscriptionDto.Email, "Confirmation Compte", EmailHelper.GetValidationEmail(userValidation.Id.ToString()));
             body.StatusCode = 200;
             body.Message = "Un mail a ete envoye pour confirmer votre compte";
         }

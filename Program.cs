@@ -2,7 +2,7 @@
 using cloud.Database;
 using Microsoft.EntityFrameworkCore;
 using cloud.email;
-
+using cloud.firebase;
 using cloud.lifeCycle;
 using cloud.login;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +27,7 @@ builder.Services.AddScoped<UserValidationService>();
 builder.Services.AddScoped<PinService>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<UniqIndentifierService>();
+builder.Services.AddScoped<FirebaseService>();
 
 builder.Services.AddControllers(); 
 builder.Services.Configure<PinSettings>(builder.Configuration.GetSection("PinSettings"));
