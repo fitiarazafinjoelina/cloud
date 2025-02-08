@@ -333,6 +333,9 @@ ALTER TABLE ONLY public.user_validation ALTER COLUMN id SET DEFAULT nextval('pub
 --
 
 COPY public.pin (id_pin, id_user, pin_number, date_debut, date_fin) FROM stdin;
+19	8	308767	2025-02-08 19:40:38	2025-02-08 19:42:08
+20	8	338317	2025-02-08 19:48:37	2025-02-08 19:50:07
+21	8	476564	2025-02-08 19:53:04	2025-02-08 19:54:34
 \.
 
 
@@ -341,6 +344,9 @@ COPY public.pin (id_pin, id_user, pin_number, date_debut, date_fin) FROM stdin;
 --
 
 COPY public.temporary_token (id_token, token, date_debut, date_fin, id_user) FROM stdin;
+22	eRRqRffZgN7cSfGgxpjT9-btRd54DjCqzxUk7Nfc5uk	2025-02-08 19:40:38	2025-02-08 20:40:38	8
+23	KVaJUOJGQE2nx6GW3m-sBv1wUSKzyAI_kEweT6WSnXA	2025-02-08 19:48:36	2025-02-08 20:48:36	8
+24	Dv95FZflZyv3U5tUKdlXN3cHtio9E4oakL3u_h0Zoj4	2025-02-08 19:53:03	2025-02-08 20:53:03	8
 \.
 
 
@@ -357,6 +363,9 @@ COPY public.temporary_uniqid (id, uniqid, date_debut, date_fin, id_user) FROM st
 --
 
 COPY public.token (id_token, token, date_debut, date_fin, id_user) FROM stdin;
+11	-_nQ7UoZOnwbwYbUZ8BX6lCPsR5XYgCqAm93eCrJyX8	2025-02-08 19:41:17	2025-02-08 20:41:17	8
+12	zHuRejeC98Wgv3HWU39Selr7EzVOS2Ll7PNMTwt4doE	2025-02-08 19:49:04	2025-02-08 20:49:04	8
+13	YD47AJtX4SV5rj0TmnDTHeo6B6y0C0hPVU9mGhqA_84	2025-02-08 19:53:42	2025-02-08 20:53:42	8
 \.
 
 
@@ -373,6 +382,7 @@ COPY public."user" (id_user, email, username, password, id_role) FROM stdin;
 --
 
 COPY public.user_cloud (id_user_cloud, email, username, password, nb_tentative, url_photo) FROM stdin;
+8	nyavorandrianarisoa@gmail.com	Ny Avo	pOfIQXXWnHiFeqCmYZzXtejO9pY=|pPMqc+iwtf6mxijlXj02nqxe/6NfNjNJx1jgOFf8IpM=	0	\N
 \.
 
 
@@ -388,14 +398,14 @@ COPY public.user_validation (id, username, email, password) FROM stdin;
 -- Name: pin_id_pin_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pin_id_pin_seq', 18, true);
+SELECT pg_catalog.setval('public.pin_id_pin_seq', 21, true);
 
 
 --
 -- Name: temporary_token_id_token_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.temporary_token_id_token_seq', 21, true);
+SELECT pg_catalog.setval('public.temporary_token_id_token_seq', 24, true);
 
 
 --
@@ -409,14 +419,14 @@ SELECT pg_catalog.setval('public.temporary_uniqid_id_seq', 1, true);
 -- Name: token_id_token_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.token_id_token_seq', 10, true);
+SELECT pg_catalog.setval('public.token_id_token_seq', 13, true);
 
 
 --
 -- Name: user_cloud_id_user_cloud_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.user_cloud_id_user_cloud_seq', 7, true);
+SELECT pg_catalog.setval('public.user_cloud_id_user_cloud_seq', 8, true);
 
 
 --
@@ -430,7 +440,7 @@ SELECT pg_catalog.setval('public.user_id_user_seq', 1, false);
 -- Name: user_validation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.user_validation_id_seq', 7, true);
+SELECT pg_catalog.setval('public.user_validation_id_seq', 8, true);
 
 
 --
