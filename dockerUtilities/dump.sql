@@ -400,12 +400,7 @@ ALTER TABLE ONLY public.user_validation ALTER COLUMN id SET DEFAULT nextval('pub
 --
 
 COPY public.pin (id_pin, id_user, pin_number, date_debut, date_fin) FROM stdin;
-19	8	308767	2025-02-08 19:40:38	2025-02-08 19:42:08
-20	8	338317	2025-02-08 19:48:37	2025-02-08 19:50:07
-21	8	476564	2025-02-08 19:53:04	2025-02-08 19:54:34
-22	8	88757	2025-02-09 06:29:25	2025-02-09 06:30:55
-23	8	214025	2025-02-09 07:30:51	2025-02-09 07:32:21
-24	9	750137	2025-02-09 07:46:59	2025-02-09 07:48:29
+26	10	431209	2025-02-09 12:30:13	2025-02-09 12:31:43
 \.
 
 
@@ -414,12 +409,7 @@ COPY public.pin (id_pin, id_user, pin_number, date_debut, date_fin) FROM stdin;
 --
 
 COPY public.temporary_token (id_token, token, date_debut, date_fin, id_user) FROM stdin;
-22	eRRqRffZgN7cSfGgxpjT9-btRd54DjCqzxUk7Nfc5uk	2025-02-08 19:40:38	2025-02-08 20:40:38	8
-23	KVaJUOJGQE2nx6GW3m-sBv1wUSKzyAI_kEweT6WSnXA	2025-02-08 19:48:36	2025-02-08 20:48:36	8
-24	Dv95FZflZyv3U5tUKdlXN3cHtio9E4oakL3u_h0Zoj4	2025-02-08 19:53:03	2025-02-08 20:53:03	8
-25	juyTAxDwYyUKVvo73CaM1Zr_rgYQST8KIpxVRJbtjZY	2025-02-09 06:29:24	2025-02-09 07:29:24	8
-26	n8NvLCKTQ-6ZY8dQHCKyCHjUbbupagnbrnCEE3yee-U	2025-02-09 07:30:49	2025-02-09 08:30:49	8
-27	4jztClIHiAPkV0n-FaNNjOe0fvLLiE4tg65CPq5qWwg	2025-02-09 07:46:58	2025-02-09 08:46:58	9
+29	3-6lVfsVVvOZmGwiKI-o7joB3k8s1GpId8ki844yjoU	2025-02-09 12:30:12	2025-02-09 13:30:12	10
 \.
 
 
@@ -436,35 +426,8 @@ COPY public.temporary_uniqid (id, uniqid, date_debut, date_fin, id_user) FROM st
 --
 
 COPY public.token (id_token, token, date_debut, date_fin, id_user) FROM stdin;
-11	-_nQ7UoZOnwbwYbUZ8BX6lCPsR5XYgCqAm93eCrJyX8	2025-02-08 19:41:17	2025-02-08 20:41:17	8
-12	zHuRejeC98Wgv3HWU39Selr7EzVOS2Ll7PNMTwt4doE	2025-02-08 19:49:04	2025-02-08 20:49:04	8
-13	YD47AJtX4SV5rj0TmnDTHeo6B6y0C0hPVU9mGhqA_84	2025-02-08 19:53:42	2025-02-08 20:53:42	8
-14	b1a5dbcc-8c5d-4da2-8967-d88ce135272d	2025-02-08 20:49:47	2025-02-15 20:49:47	8
-15	eb282a3c-6fd7-4548-81d7-4d117901023c	2025-02-08 19:45:15	2025-02-15 19:45:15	8
-16	b1a5dbcc-8c5d-4da2-8967-d88ce135272d	2025-02-08 20:49:47	2025-02-15 20:49:47	8
-17	eb282a3c-6fd7-4548-81d7-4d117901023c	2025-02-08 19:45:15	2025-02-15 19:45:15	8
-18	6cf25d8c-cc66-4840-8df9-317a1b5165ac	2025-02-08 20:16:33	2025-02-15 20:16:33	8
-19	6cf25d8c-cc66-4840-8df9-317a1b5165ac	2025-02-08 20:16:33	2025-02-15 20:16:33	8
-21	f1be9466-6b68-4b18-b098-c9d0b4312c6d	2025-02-08 20:16:25	2025-02-15 20:16:25	8
-20	f1be9466-6b68-4b18-b098-c9d0b4312c6d	2025-02-08 20:16:25	2025-02-15 20:16:25	8
-22	90773f13-3ac8-4a1e-b430-40c7e0cd00c6	2025-02-09 04:49:01	2025-02-16 04:49:01	8
-23	90773f13-3ac8-4a1e-b430-40c7e0cd00c6	2025-02-09 04:49:01	2025-02-16 04:49:01	8
-25	178639b6-532c-4e17-881a-59d44da6c933	2025-02-08 20:08:23	2025-02-15 20:08:23	8
-24	178639b6-532c-4e17-881a-59d44da6c933	2025-02-08 20:08:23	2025-02-15 20:08:23	8
-26	e7a051ce-a30a-4dfd-87bb-85d171759539	2025-02-08 20:42:51	2025-02-15 20:42:51	8
-27	e7a051ce-a30a-4dfd-87bb-85d171759539	2025-02-08 20:42:51	2025-02-15 20:42:51	8
-28	ae4fb20f-d804-4bf1-be40-de167dbfa0c5	2025-02-08 20:36:07	2025-02-15 20:36:07	8
-29	ae4fb20f-d804-4bf1-be40-de167dbfa0c5	2025-02-08 20:36:07	2025-02-15 20:36:07	8
-30	592dcf46-d3cc-46a1-94cc-fb1377f2c8db	2025-02-08 20:51:06	2025-02-15 20:51:06	8
-31	592dcf46-d3cc-46a1-94cc-fb1377f2c8db	2025-02-08 20:51:06	2025-02-15 20:51:06	8
-32	4En-miVlzNe23pEQQ58iDZLzhFfUZ2-yuH5RK5y1g70	2025-02-09 06:30:01	2025-02-09 07:30:01	8
-33	51f4f1ed-41e2-4ea9-828c-b3b86b8ff4a7	2025-02-09 07:02:36	2025-02-16 07:02:36	8
-34	2bcc6db3-b86b-442f-bfb8-a5f332f806ca	2025-02-09 07:02:38	2025-02-16 07:02:38	8
-35	3ceac38b-eeae-409c-805a-4889397e4321	2025-02-09 07:02:48	2025-02-16 07:02:48	8
-36	13a44123-a097-4869-b114-bc656b4e2851	2025-02-09 07:07:16	2025-02-16 07:07:16	8
-37	xtHUp2jfiXhDjtpAETZcvRz929nRXAaj4PmTy4NT1QI	2025-02-09 07:31:25	2025-02-09 08:31:25	8
-38	Elo2DcG7XacF8rUOgfafimUZwUk0Cb9MM5bDvh4AY0Y	2025-02-09 07:47:25	2025-02-09 08:47:25	9
-39	799e2b51-6ec7-48d7-9e6c-3e358a5b23e6	2025-02-09 09:04:29	2025-02-16 09:04:29	8
+100	jBbEKDPkx0fvCJBt0kCq7XUhge3TzYIvqSidwu8MAF0	2025-02-09 12:30:31	2025-02-09 13:30:31	10
+101	223bf0d3-a8a4-4b4b-a969-679b637f4304	2025-02-09 12:41:53	2025-02-16 12:41:53	10
 \.
 
 
@@ -482,7 +445,7 @@ COPY public."user" (id_user, email, username, password, id_role) FROM stdin;
 
 COPY public.user_cloud (id_user_cloud, email, username, password, nb_tentative, url_photo) FROM stdin;
 8	nyavorandrianarisoa@gmail.com	Ny Avo	pOfIQXXWnHiFeqCmYZzXtejO9pY=|pPMqc+iwtf6mxijlXj02nqxe/6NfNjNJx1jgOFf8IpM=	0	1739044009544_photo_1739044009534.jpg
-9	nyavorandrianarisoa.auth@gmail.com	Ny Avo auth	cTJ5RUgQVzchlM+7eBntAb+EwVA=|ws3ll44rpH8tJjJyaRjGf7+VJxCKUN3PmnDQ9uG83Ss=	0	\N
+10	mpitsara123@gmail.com	Mpitsara	wyM4iFhhCShP/pt2FA2OxaJjAuE=|nTRFxFGH1HBeqF8QofmdQMn0chQQTuAB5+oDQu8bdmQ=	0	1739105000963_photo_1739105000951.jpg
 \.
 
 
@@ -498,14 +461,14 @@ COPY public.user_validation (id, username, email, password) FROM stdin;
 -- Name: pin_id_pin_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pin_id_pin_seq', 24, true);
+SELECT pg_catalog.setval('public.pin_id_pin_seq', 26, true);
 
 
 --
 -- Name: temporary_token_id_token_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.temporary_token_id_token_seq', 27, true);
+SELECT pg_catalog.setval('public.temporary_token_id_token_seq', 29, true);
 
 
 --
@@ -519,14 +482,14 @@ SELECT pg_catalog.setval('public.temporary_uniqid_id_seq', 1, true);
 -- Name: token_id_token_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.token_id_token_seq', 39, true);
+SELECT pg_catalog.setval('public.token_id_token_seq', 101, true);
 
 
 --
 -- Name: user_cloud_id_user_cloud_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.user_cloud_id_user_cloud_seq', 9, true);
+SELECT pg_catalog.setval('public.user_cloud_id_user_cloud_seq', 10, true);
 
 
 --
@@ -540,7 +503,7 @@ SELECT pg_catalog.setval('public.user_id_user_seq', 1, false);
 -- Name: user_validation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.user_validation_id_seq', 9, true);
+SELECT pg_catalog.setval('public.user_validation_id_seq', 10, true);
 
 
 --
